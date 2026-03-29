@@ -1,0 +1,16 @@
+services:
+  dev:
+    build: .
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - ~/.ssh:/root/.ssh:ro
+    ports:
+      - "4321:4321"
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  node_modules:

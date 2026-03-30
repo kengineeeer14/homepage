@@ -1,6 +1,8 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TERM=xterm-256color
+ENV SHELL=/bin/bash
 
 RUN apt-get update && apt-get install -y \
     curl \

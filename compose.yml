@@ -4,6 +4,7 @@ services:
     volumes:
       - .:/app
       - ~/.ssh:/home/developer/.ssh:ro
+      - ~/.claude:/home/developer/.claude
     ports:
       - "4321:4321"
     working_dir: /app

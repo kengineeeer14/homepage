@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     openssh-client \
+    bash-completion \
     && rm -rf /var/lib/apt/lists/*
 
 # Node.js 22 のインストール

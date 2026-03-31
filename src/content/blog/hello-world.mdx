@@ -1,0 +1,74 @@
+---
+title: "はじめての記事：数式とコードのテスト"
+description: "KaTeXによる数式レンダリングとShikiによるコードハイライト、コピーボタンの動作確認"
+date: 2026-03-31
+tags: ["test", "math", "code"]
+---
+
+このブログの最初の記事です。数式とコードブロックが正しく動作するか確認します。
+
+## 数式のテスト
+
+インライン数式: $E = mc^2$ や $\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$ のように書けます。
+
+ディスプレイ数式:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+
+行列の例:
+
+$$
+A = \begin{pmatrix}
+  a_{11} & a_{12} \\
+  a_{21} & a_{22}
+\end{pmatrix}
+$$
+
+## コードブロックのテスト
+
+Python のサンプル:
+
+```python
+def fibonacci(n: int) -> int:
+    """フィボナッチ数列のn番目を返す"""
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+print(fibonacci(10))  # 55
+```
+
+TypeScript のサンプル:
+
+```typescript
+interface Post {
+  title: string;
+  date: Date;
+  tags: string[];
+}
+
+const formatDate = (date: Date): string =>
+  date.toISOString().slice(0, 10);
+
+const latestPost: Post = {
+  title: 'はじめての記事',
+  date: new Date('2026-03-31'),
+  tags: ['test', 'math'],
+};
+
+console.log(formatDate(latestPost.date)); // "2026-03-31"
+```
+
+コードブロック右上の `copy` ボタンをクリックするとクリップボードにコピーされます。
+
+## まとめ
+
+- ✅ 数式（インライン・ディスプレイ）
+- ✅ コードブロック（シンタックスハイライト）
+- ✅ コピーボタン
+- ✅ タグ機能

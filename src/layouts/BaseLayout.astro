@@ -1,0 +1,69 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'エンジニアの学習・趣味アウトプットブログ' } = Astro.props;
+const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    {canonicalURL && <link rel="canonical" href={canonicalURL} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body style="background-color: #0d1117; min-height: 100vh;">
+    <header style="border-bottom: 1px solid #30363d; background-color: #161b22;">
+      <nav style="max-width: 900px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+        <a href="/" style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: #58a6ff; text-decoration: none; font-weight: 500;">
+          <span style="color: #8b949e;">&gt;_</span> dev.log
+        </a>
+        <ul style="list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0;">
+          <li><a href="/" style="color: #8b949e; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#8b949e'">Home</a></li>
+          <li><a href="/blog" style="color: #8b949e; text-decoration: none; font-size: 0.9rem;" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#8b949e'">Blog</a></li>
+          <li><a href="/about" style="color: #8b949e; text-decoration: none; font-size: 0.9rem;" onmouseover="this.style.color='#e6edf3'" onmouseout="this.style.color='#8b949e'">About</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main style="max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem;">
+      <slot />
+    </main>
+
+    <footer style="border-top: 1px solid #30363d; margin-top: 4rem; padding: 2rem 1.5rem; text-align: center; color: #8b949e; font-size: 0.85rem;">
+      <p>© {new Date().getFullYear()} dev.log — Built with <a href="https://astro.build" style="color: #58a6ff; text-decoration: none;">Astro</a></p>
+    </footer>
+
+    <!-- コードブロックにコピーボタンを追加 -->
+    <script>
+      document.querySelectorAll('pre').forEach((pre) => {
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = 'copy';
+        btn.addEventListener('click', async () => {
+          const code = pre.querySelector('code');
+          const text = code?.textContent ?? '';
+          await navigator.clipboard.writeText(text);
+          btn.textContent = 'copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'copy';
+            btn.classList.remove('copied');
+          }, 2000);
+        });
+        pre.appendChild(btn);
+      });
+    </script>
+  </body>
+</html>

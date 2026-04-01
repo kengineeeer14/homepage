@@ -7,10 +7,16 @@ const posts = (await getCollection("blog"))
   .slice(0, 5);
 ---
 
-<BaseLayout title="dev.log">
+<BaseLayout title="ken.log">
   <!-- Hero -->
-  <section style="padding: 3rem 0 2rem; display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;">
-    <img src="/icon.jpg" alt="アイコン" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2px solid #30363d; flex-shrink: 0;" />
+  <section
+    style="padding: 3rem 0 2rem; display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;"
+  >
+    <img
+      src="/icon.jpg"
+      alt="アイコン"
+      style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2px solid #30363d; flex-shrink: 0;"
+    />
     <div>
       <p
         style="color: #58a6ff; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 0.75rem;"
@@ -20,12 +26,12 @@ const posts = (await getCollection("blog"))
       <h1
         style="font-size: 2.5rem; font-weight: 700; color: #e6edf3; margin-bottom: 1rem; line-height: 1.2;"
       >
-        Learning by Writing.
+        Ken's Log
       </h1>
       <p
         style="color: #8b949e; font-size: 1.1rem; max-width: 56ch; line-height: 1.8; margin-bottom: 2rem;"
       >
-        技術の学びと趣味をアウトプットするブログ。数式・コード付きで丁寧に記録していきます。
+        30代のサラリーマンです．好きなことを好きに発信します．
       </p>
       <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
         <a

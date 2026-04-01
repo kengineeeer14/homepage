@@ -114,8 +114,9 @@ a.mobile-nav-item.active:visited { color: #4ade80; }
   /* タブバーを非表示 */
   .vscode-tabs { display: none; }
 
-  /* ターミナルを非表示 */
-  .vscode-terminal-panel { display: none; }
+  /* ターミナルの高さをモバイル向けに縮小 */
+  .vscode-terminal-panel { flex-shrink: 0; }
+  .terminal-panel-body { height: 80px; }
 
   /* コンテンツの余白調整 */
   .vscode-content { padding: 1.5rem 1rem; }

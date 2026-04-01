@@ -83,6 +83,11 @@
   outline: none;
 }
 
+/* 訪問済みリンクの色変化を無効化 */
+a:visited {
+  color: inherit;
+}
+
 /* モバイルナビ */
 .mobile-nav {
   display: none;

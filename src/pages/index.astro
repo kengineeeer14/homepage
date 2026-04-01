@@ -1,77 +1,128 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
 
-const posts = (await getCollection('blog'))
+const posts = (await getCollection("blog"))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 5);
 ---
 
 <BaseLayout title="dev.log">
   <!-- Hero -->
-  <section style="padding: 3rem 0 2rem;">
-    <p style="color: #58a6ff; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 0.75rem;">$ whoami</p>
-    <h1 style="font-size: 2.5rem; font-weight: 700; color: #e6edf3; margin-bottom: 1rem; line-height: 1.2;">
-      Learning by Writing.
-    </h1>
-    <p style="color: #8b949e; font-size: 1.1rem; max-width: 56ch; line-height: 1.8; margin-bottom: 2rem;">
-      技術の学びと趣味をアウトプットするブログ。数式・コード付きで丁寧に記録していきます。
-    </p>
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-      <a href="/blog" style="background-color: #58a6ff; color: #0d1117; padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
-        記事を読む →
-      </a>
-      <a href="/about" style="border: 1px solid #30363d; color: #8b949e; padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem;">
-        About
-      </a>
+  <section style="padding: 3rem 0 2rem; display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;">
+    <img src="/icon.jpg" alt="アイコン" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2px solid #30363d; flex-shrink: 0;" />
+    <div>
+      <p
+        style="color: #58a6ff; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 0.75rem;"
+      >
+        $ whoami
+      </p>
+      <h1
+        style="font-size: 2.5rem; font-weight: 700; color: #e6edf3; margin-bottom: 1rem; line-height: 1.2;"
+      >
+        Learning by Writing.
+      </h1>
+      <p
+        style="color: #8b949e; font-size: 1.1rem; max-width: 56ch; line-height: 1.8; margin-bottom: 2rem;"
+      >
+        技術の学びと趣味をアウトプットするブログ。数式・コード付きで丁寧に記録していきます。
+      </p>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a
+          href="/blog"
+          style="background-color: #58a6ff; color: #0d1117; padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;"
+        >
+          記事を読む →
+        </a>
+        <a
+          href="/about"
+          style="border: 1px solid #30363d; color: #8b949e; padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem;"
+        >
+          About
+        </a>
+      </div>
     </div>
   </section>
 
   <!-- Stats bar -->
-  <div style="display: flex; gap: 2rem; padding: 1.25rem 1.5rem; background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; margin: 2rem 0; flex-wrap: wrap;">
+  <div
+    style="display: flex; gap: 2rem; padding: 1.25rem 1.5rem; background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; margin: 2rem 0; flex-wrap: wrap;"
+  >
     <div>
-      <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #58a6ff; font-weight: 600;">{posts.length}</div>
+      <div
+        style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #58a6ff; font-weight: 600;"
+      >
+        {posts.length}
+      </div>
       <div style="color: #8b949e; font-size: 0.8rem;">articles</div>
     </div>
     <div style="width: 1px; background: #30363d;"></div>
     <div>
-      <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #3fb950; font-weight: 600;">∑</div>
+      <div
+        style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #3fb950; font-weight: 600;"
+      >
+        ∑
+      </div>
       <div style="color: #8b949e; font-size: 0.8rem;">math ready</div>
     </div>
     <div style="width: 1px; background: #30363d;"></div>
     <div>
-      <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #d2a8ff; font-weight: 600;">&lt;/&gt;</div>
+      <div
+        style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #d2a8ff; font-weight: 600;"
+      >
+        &lt;/&gt;
+      </div>
       <div style="color: #8b949e; font-size: 0.8rem;">code copy</div>
     </div>
   </div>
 
   <!-- 最新記事 -->
   <section style="margin-top: 3rem;">
-    <h2 style="font-size: 1.1rem; color: #8b949e; font-family: 'JetBrains Mono', monospace; margin-bottom: 1.25rem;">
+    <h2
+      style="font-size: 1.1rem; color: #8b949e; font-family: 'JetBrains Mono', monospace; margin-bottom: 1.25rem;"
+    >
       $ ls -lt ./blog | head -5
     </h2>
 
-    {posts.length === 0 ? (
-      <p style="color: #8b949e; font-style: italic;">記事はまだありません。</p>
-    ) : (
-      <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1px;">
-        {posts.map((post) => (
-          <li>
-            <a href={`/blog/${post.id}`} style="display: flex; justify-content: space-between; align-items: baseline; padding: 0.875rem 1rem; border: 1px solid #30363d; border-radius: 6px; text-decoration: none; background-color: #161b22; transition: border-color 0.2s; gap: 1rem;" onmouseover="this.style.borderColor='#58a6ff'" onmouseout="this.style.borderColor='#30363d'">
-              <span style="color: #e6edf3; font-size: 0.95rem;">{post.data.title}</span>
-              <span style="color: #8b949e; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; white-space: nowrap;">
-                {post.data.date.toISOString().slice(0, 10)}
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    )}
+    {
+      posts.length === 0 ? (
+        <p style="color: #8b949e; font-style: italic;">
+          記事はまだありません。
+        </p>
+      ) : (
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1px;">
+          {posts.map((post) => (
+            <li>
+              <a
+                href={`/blog/${post.id}`}
+                style="display: flex; justify-content: space-between; align-items: baseline; padding: 0.875rem 1rem; border: 1px solid #30363d; border-radius: 6px; text-decoration: none; background-color: #161b22; transition: border-color 0.2s; gap: 1rem;"
+                onmouseover="this.style.borderColor='#58a6ff'"
+                onmouseout="this.style.borderColor='#30363d'"
+              >
+                <span style="color: #e6edf3; font-size: 0.95rem;">
+                  {post.data.title}
+                </span>
+                <span style="color: #8b949e; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; white-space: nowrap;">
+                  {post.data.date.toISOString().slice(0, 10)}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
 
-    {posts.length > 0 && (
-      <div style="margin-top: 1rem; text-align: right;">
-        <a href="/blog" style="color: #58a6ff; text-decoration: none; font-size: 0.9rem;">全記事を見る →</a>
-      </div>
-    )}
+    {
+      posts.length > 0 && (
+        <div style="margin-top: 1rem; text-align: right;">
+          <a
+            href="/blog"
+            style="color: #58a6ff; text-decoration: none; font-size: 0.9rem;"
+          >
+            全記事を見る →
+          </a>
+        </div>
+      )
+    }
   </section>
 </BaseLayout>

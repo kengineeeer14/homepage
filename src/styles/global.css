@@ -78,6 +78,17 @@
   overflow-y: auto;
   flex-shrink: 0;
 }
+/* マウス操作時のフォーカスアウトラインを非表示（キーボード操作時は維持） */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+.activity-icon:focus,
+.dir-toggle:focus,
+#search-toggle:focus,
+#term-input:focus {
+  outline: none;
+}
+
 /* モバイルナビ */
 .mobile-nav {
   display: none;

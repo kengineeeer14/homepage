@@ -1,11 +1,11 @@
 ---
-title: "はじめての記事：数式とコードのテスト"
+title: "test：数式とコードのテスト"
 description: "KaTeXによる数式レンダリングとShikiによるコードハイライト、コピーボタンの動作確認"
 date: 2026-03-31
 tags: ["test", "math", "code"]
 ---
 
-このブログの最初の記事です。数式とコードブロックが正しく動作するか確認します。
+このブログのテスト記事です。数式とコードブロックが正しく動作するか確認します。
 
 ## 数式のテスト
 
@@ -52,13 +52,12 @@ interface Post {
   tags: string[];
 }
 
-const formatDate = (date: Date): string =>
-  date.toISOString().slice(0, 10);
+const formatDate = (date: Date): string => date.toISOString().slice(0, 10);
 
 const latestPost: Post = {
-  title: 'はじめての記事',
-  date: new Date('2026-03-31'),
-  tags: ['test', 'math'],
+  title: "はじめての記事",
+  date: new Date("2026-03-31"),
+  tags: ["test", "math"],
 };
 
 console.log(formatDate(latestPost.date)); // "2026-03-31"

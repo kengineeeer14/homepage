@@ -7,7 +7,14 @@ const posts = (await getCollection("blog"))
   .slice(0, 5);
 ---
 
-<BaseLayout title="ken.log">
+<BaseLayout
+  title="ken.log"
+  meta={{
+    type: "home",
+    postCount: posts.length,
+    lastUpdated: posts[0]?.data.date,
+  }}
+>
   <!-- Hero -->
   <section
     style="padding: 3rem 0 2rem; display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;"
@@ -26,7 +33,7 @@ const posts = (await getCollection("blog"))
       <h1
         style="font-size: 2.5rem; font-weight: 700; color: #e6edf3; margin-bottom: 1rem; line-height: 1.2;"
       >
-        Ken's Log
+        Ken's Blog
       </h1>
       <p
         style="color: #8b949e; font-size: 1.1rem; max-width: 56ch; line-height: 1.8; margin-bottom: 2rem;"

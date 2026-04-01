@@ -16,7 +16,7 @@ const posts = selectedTag
   : allPosts;
 ---
 
-<BaseLayout title="Blog | ken.log" description="学習・趣味のアウトプットブログ">
+<BaseLayout title="Blog | ken.log" description="学習・趣味のアウトプットブログ" meta={{ type: "blog", postCount: allPosts.length, allTags }}>
   <div style="padding: 2rem 0;">
     <p
       style="color: #58a6ff; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 0.5rem;"

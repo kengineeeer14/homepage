@@ -6,14 +6,7 @@ const allPosts = (await getCollection("blog"))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// タグ一覧
 const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags))].sort();
-
-// クエリパラメータでタグフィルター
-const selectedTag = Astro.url.searchParams.get("tag");
-const posts = selectedTag
-  ? allPosts.filter((p) => p.data.tags.includes(selectedTag))
-  : allPosts;
 ---
 
 <BaseLayout title="Blog | ken.log" description="学習・趣味のアウトプットブログ" meta={{ type: "blog", postCount: allPosts.length, allTags }}>
@@ -28,25 +21,15 @@ const posts = selectedTag
     >
       Blog
     </h1>
-    <p style="color: #8b949e; margin-bottom: 2rem;">{allPosts.length} 記事</p>
+    <p id="post-count" style="color: #8b949e; margin-bottom: 2rem;">{allPosts.length} 記事</p>
 
     <!-- タグフィルター -->
     {
       allTags.length > 0 && (
         <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem;">
-          <a
-            href="/blog"
-            style={`padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; text-decoration: none; border: 1px solid ${!selectedTag ? "#58a6ff" : "#30363d"}; color: ${!selectedTag ? "#58a6ff" : "#8b949e"};`}
-          >
-            すべて
-          </a>
+          <button class="tag-btn active" data-tag="">すべて</button>
           {allTags.map((tag) => (
-            <a
-              href={`/blog?tag=${tag}`}
-              style={`padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; text-decoration: none; border: 1px solid ${selectedTag === tag ? "#58a6ff" : "#30363d"}; color: ${selectedTag === tag ? "#58a6ff" : "#8b949e"};`}
-            >
-              #{tag}
-            </a>
+            <button class="tag-btn" data-tag={tag}>#{tag}</button>
           ))}
         </div>
       )
@@ -54,14 +37,14 @@ const posts = selectedTag
 
     <!-- 記事一覧 -->
     {
-      posts.length === 0 ? (
+      allPosts.length === 0 ? (
         <p style="color: #8b949e; font-style: italic;">
           記事はまだありません。
         </p>
       ) : (
-        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
-          {posts.map((post) => (
-            <li>
+        <ul id="post-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+          {allPosts.map((post) => (
+            <li data-tags={JSON.stringify(post.data.tags)}>
               <a
                 href={`/blog/${post.id}`}
                 class="post-link"
@@ -100,4 +83,66 @@ const posts = selectedTag
   .post-link:hover {
     border-color: #58a6ff !important;
   }
+
+  .tag-btn {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: none;
+    border: 1px solid #30363d;
+    color: #8b949e;
+    font-family: inherit;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .tag-btn:hover {
+    border-color: #58a6ff;
+    color: #58a6ff;
+  }
+  .tag-btn.active {
+    border-color: #58a6ff;
+    color: #58a6ff;
+  }
 </style>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.tag-btn');
+  const items = document.querySelectorAll<HTMLLIElement>('#post-list li');
+  const countEl = document.getElementById('post-count');
+
+  function applyFilter(tag: string) {
+    let visible = 0;
+    items.forEach((item) => {
+      const tags: string[] = JSON.parse(item.dataset.tags ?? '[]');
+      const show = tag === '' || tags.includes(tag);
+      item.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    if (countEl) {
+      countEl.textContent = tag === ''
+        ? `${items.length} 記事`
+        : `${visible} 記事（#${tag}）`;
+    }
+
+    buttons.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.tag === tag);
+    });
+
+    const url = new URL(window.location.href);
+    if (tag) {
+      url.searchParams.set('tag', tag);
+    } else {
+      url.searchParams.delete('tag');
+    }
+    history.replaceState(null, '', url.toString());
+  }
+
+  // ページ読み込み時にURLのtagパラメータを適用
+  const initialTag = new URL(window.location.href).searchParams.get('tag') ?? '';
+  applyFilter(initialTag);
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => applyFilter(btn.dataset.tag ?? ''));
+  });
+</script>

@@ -79,16 +79,24 @@
   flex-shrink: 0;
 }
 /* フォーカスアウトラインを非表示 */
-*:focus {
+*:focus,
+*:focus-visible {
   outline: none;
 }
 
-/* 訪問済みリンクの色変化を無効化（a.class:visited で特異度を上げて確実に上書き） */
+/* タップ/クリック時のハイライトを無効化 */
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 訪問済みリンクの色変化を無効化 */
+a:visited { color: inherit; }
 a.activity-icon:visited { color: #8b949e; }
 a.sidebar-file:visited { color: #8b949e; }
 a.sidebar-file.active:visited { color: #e6edf3; }
 a.mobile-nav-item:visited { color: #8b949e; }
 a.mobile-nav-item.active:visited { color: #4ade80; }
+.prose a:visited { color: var(--color-accent); }
 
 /* モバイルナビ */
 .mobile-nav {

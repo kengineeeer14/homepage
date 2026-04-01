@@ -64,9 +64,8 @@ const posts = selectedTag
             <li>
               <a
                 href={`/blog/${post.id}`}
+                class="post-link"
                 style="display: block; padding: 1.25rem; border: 1px solid #30363d; border-radius: 8px; text-decoration: none; background-color: #161b22; transition: border-color 0.2s;"
-                onmouseover="this.style.borderColor='#58a6ff'"
-                onmouseout="this.style.borderColor='#30363d'"
               >
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
                   <h2 style="font-size: 1rem; font-weight: 600; color: #e6edf3; margin: 0 0 0.375rem;">
@@ -96,3 +95,9 @@ const posts = selectedTag
     }
   </div>
 </BaseLayout>
+
+<style>
+  .post-link:hover {
+    border-color: #58a6ff !important;
+  }
+</style>

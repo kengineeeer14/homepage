@@ -108,9 +108,8 @@ const posts = (await getCollection("blog"))
             <li>
               <a
                 href={`/blog/${post.id}`}
+                class="post-link"
                 style="display: flex; justify-content: space-between; align-items: baseline; padding: 0.875rem 1rem; border: 1px solid #30363d; border-radius: 6px; text-decoration: none; background-color: #161b22; transition: border-color 0.2s; gap: 1rem;"
-                onmouseover="this.style.borderColor='#58a6ff'"
-                onmouseout="this.style.borderColor='#30363d'"
               >
                 <span style="color: #e6edf3; font-size: 0.95rem;">
                   {post.data.title}
@@ -139,3 +138,9 @@ const posts = (await getCollection("blog"))
     }
   </section>
 </BaseLayout>
+
+<style>
+  .post-link:hover {
+    border-color: #58a6ff !important;
+  }
+</style>

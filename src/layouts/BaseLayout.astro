@@ -63,6 +63,22 @@ const filename =
       <span style="color: #8b949e; font-size: 0.75rem;">ken.log — {filename}</span>
     </div>
 
+    <!-- モバイルナビ -->
+    <nav class="mobile-nav">
+      <a href="/" class={"mobile-nav-item" + (path === "/" ? " active" : "")}>
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M3 10L11 3L19 10V19H14V14H8V19H3V10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Home</span>
+      </a>
+      <a href="/blog" class={"mobile-nav-item" + (path.startsWith("/blog") ? " active" : "")}>
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><rect x="4" y="2" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="7.5" y1="8" x2="14.5" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7.5" y1="11.5" x2="14.5" y2="11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7.5" y1="15" x2="11.5" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Blog</span>
+      </a>
+      <a href="/about" class={"mobile-nav-item" + (path === "/about" ? " active" : "")}>
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M3 21C3 16.582 6.582 13 11 13C15.418 13 19 16.582 19 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>About</span>
+      </a>
+    </nav>
+
     <div class="vscode-workbench">
 
       <!-- アクティビティバー -->

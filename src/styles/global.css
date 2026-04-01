@@ -78,9 +78,70 @@
   overflow-y: auto;
   flex-shrink: 0;
 }
-@media (max-width: 640px) {
-  .vscode-sidebar { display: none; }
+/* モバイルナビ */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* サイドバー・アクティビティバーを非表示 */
+  .vscode-sidebar { display: none !important; }
   .vscode-activitybar { display: none; }
+
+  /* タイトルバーを非表示 */
+  .vscode-titlebar { display: none; }
+
+  /* タブバーを非表示 */
+  .vscode-tabs { display: none; }
+
+  /* ターミナルを非表示 */
+  .vscode-terminal-panel { display: none; }
+
+  /* コンテンツの余白調整 */
+  .vscode-content { padding: 1.5rem 1rem; }
+
+  /* ステータスバー非表示 */
+  .vscode-statusbar { display: none; }
+
+  /* モバイルナビを表示 */
+  .mobile-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #161b22;
+    border-bottom: 1px solid #30363d;
+    border-top: 3px solid #4ade80;
+    padding: 0;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.6rem 1.5rem;
+    color: #8b949e;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    flex: 1;
+    transition: color 0.15s;
+  }
+
+  .mobile-nav-item.active {
+    color: #4ade80;
+    border-bottom: 2px solid #4ade80;
+  }
+
+  .mobile-nav-item:hover {
+    color: #e6edf3;
+  }
+
+  /* ヒーローセクションのアイコン調整 */
+  section[style*="flex"] {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
 }
 .sidebar-section-title {
   color: #8b949e;

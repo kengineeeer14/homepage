@@ -69,6 +69,8 @@ https://homepage-3pk.pages.dev
 ① 記事・コードを編集
         ↓
 ② ブラウザで見た目を確認（自動ホットリロード）
+   npm run dev -- --host 0.0.0.0     # コンテナ内で実行
+   # または docker compose up        # ホストマシンで実行
         ↓
 ③ 本番ビルドで最終確認
    npm run build && npm run preview -- --host 0.0.0.0

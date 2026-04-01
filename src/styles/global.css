@@ -79,7 +79,7 @@
   flex-shrink: 0;
 }
 /* フォーカスアウトラインを非表示 */
-a:focus, button:focus {
+*:focus {
   outline: none;
 }
 

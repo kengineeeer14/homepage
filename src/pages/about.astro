@@ -1,35 +1,47 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="About | dev.log" description="このブログについて">
-  <article class="prose" style="max-width: 72ch; margin: 0 auto; padding: 2rem 0;">
-    <p style="color: #58a6ff; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 1rem;">$ cat about.md</p>
+<BaseLayout title="About | ken.log" description="このブログについて" meta={{ type: "about" }}>
+  <article
+    class="prose"
+    style="max-width: 72ch; margin: 0 auto; padding: 2rem 0;"
+  >
+    <p
+      style="color: #58a6ff; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 1rem;"
+    >
+      $ cat about.md
+    </p>
     <h1>About</h1>
 
     <h2>このブログについて</h2>
     <p>
-      学んだことを自分の言葉で書き留めるためのブログです。
-      技術的な内容（数学・プログラミング・機械学習など）と趣味の内容を気ままに発信しています。
-    </p>
+      美味しいもの、楽しかったこと、技術の学び——テーマはバラバラ、更新もゆるめ。「好きなことを好きに発信する」をモットーにした雑記ブログです。
 
-    <h2>コンテンツ</h2>
-    <ul>
-      <li><strong>技術記事</strong> — 数式・コード付きで学習内容をアウトプット</li>
-      <li><strong>趣味記事</strong> — 日常・趣味で気になったことを記録</li>
-    </ul>
+      <h2>コンテンツ</h2>
+      <ul>
+        <li>
+          <strong>技術記事</strong> — 学んだ技術を定着させるためのアウトプット
+        </li>
+        <li><strong>趣味記事</strong> — 日常・趣味で心に残ったことを記録</li>
+      </ul>
 
-    <h2>技術スタック</h2>
-    <ul>
-      <li><a href="https://astro.build">Astro</a> — 静的サイトジェネレーター</li>
-      <li><a href="https://tailwindcss.com">Tailwind CSS</a> — スタイリング</li>
-      <li><a href="https://katex.org">KaTeX</a> — 数式レンダリング</li>
-      <li>Shiki — シンタックスハイライト</li>
-    </ul>
+      <h2>技術スタック</h2>
+      <ul>
+        <li>
+          <a href="https://astro.build">Astro</a> — 静的サイトジェネレーター
+        </li>
+        <li>
+          <a href="https://tailwindcss.com">Tailwind CSS</a> — スタイリング
+        </li>
+        <li><a href="https://katex.org">KaTeX</a> — 数式レンダリング</li>
+        <li>Shiki — シンタックスハイライト</li>
+      </ul>
 
-    <hr />
-    <p style="color: #8b949e; font-size: 0.9rem;">
-      記事の内容に誤りや改善点があればお知らせください。
+      <hr />
+      <p style="color: #8b949e; font-size: 0.9rem;">
+        記事の内容に誤りや改善点があればお知らせください。
+      </p>
     </p>
   </article>
 </BaseLayout>

@@ -429,16 +429,29 @@ const filename =
       })();
     </script>
 
-    <!-- ディレクトリトグル -->
+    <!-- ディレクトリトグル：開閉状態の即時復元（チラつき防止） -->
+    <script is:inline>
+      ['dir-home', 'dir-blog'].forEach(function(id) {
+        if (localStorage.getItem('dir:' + id) === 'closed') {
+          var el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+          var arrow = document.querySelector('[data-target="' + id + '"]');
+          if (arrow) arrow.textContent = '▸';
+        }
+      });
+    </script>
+    <!-- ディレクトリトグル：クリックイベント -->
     <script>
       document.querySelectorAll('.dir-toggle').forEach((arrow) => {
+        const targetId = arrow.getAttribute('data-target')!;
+        const target = document.getElementById(targetId);
+        if (!target) return;
+
         arrow.addEventListener('click', () => {
-          const targetId = arrow.getAttribute('data-target');
-          const target = document.getElementById(targetId!);
-          if (!target) return;
           const isOpen = target.style.display !== 'none';
           target.style.display = isOpen ? 'none' : '';
           arrow.textContent = isOpen ? '▸' : '▾';
+          localStorage.setItem('dir:' + targetId, isOpen ? 'closed' : 'open');
         });
       });
     </script>

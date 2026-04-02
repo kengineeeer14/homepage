@@ -18,25 +18,35 @@ interface Props {
   meta?: Meta;
 }
 
-const { title, description = "エンジニアの学習・趣味アウトプットブログ", meta = {} } = Astro.props;
-const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
+const {
+  title,
+  description = "エンジニアの学習・趣味アウトプットブログ",
+  meta = {},
+} = Astro.props;
+const canonicalURL = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site)
+  : null;
 
-const path = Astro.url.pathname;
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 
 const allPosts = (await getCollection("blog"))
   .filter((p) => !p.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 const currentPost = path.startsWith("/blog/")
-  ? allPosts.find(p => `/blog/${p.id}` === path)
+  ? allPosts.find((p) => `/blog/${p.id}` === path)
   : null;
 
 const filename =
-  path === "/" ? "home"
-  : path === "/about" ? "about"
-  : path === "/blog" ? "blog"
-  : currentPost ? currentPost.data.title
-  : "home";
+  path === "/"
+    ? "home"
+    : path === "/about"
+      ? "about"
+      : path === "/blog"
+        ? "blog"
+        : currentPost
+          ? currentPost.data.title
+          : "home";
 ---
 
 <!doctype html>
@@ -57,72 +67,227 @@ const filename =
     />
   </head>
   <body class="vscode-layout">
-
     <!-- タイトルバー -->
     <div class="vscode-titlebar">
-      <span style="color: #8b949e; font-size: 0.75rem;">ken.log — {filename}</span>
+      <span style="color: #8b949e; font-size: 0.75rem;"
+        >ken.log — {filename}</span
+      >
     </div>
 
     <!-- モバイル検索オーバーレイ -->
-    <div id="mobile-search-overlay" style="display:none;position:fixed;inset:0;background:#0d1117;z-index:999;flex-direction:column;">
-      <div style="display:flex;align-items:center;padding:0.75rem 1rem;border-bottom:1px solid #30363d;background:#161b22;">
-        <input id="mobile-search-input" type="text" placeholder="記事を検索..."
-          style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:4px;color:#e6edf3;font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:0.4rem 0.6rem;outline:none;" />
+    <div
+      id="mobile-search-overlay"
+      style="display:none;position:fixed;inset:0;background:#0d1117;z-index:999;flex-direction:column;"
+    >
+      <div
+        style="display:flex;align-items:center;padding:0.75rem 1rem;border-bottom:1px solid #30363d;background:#161b22;"
+      >
+        <input
+          id="mobile-search-input"
+          type="text"
+          placeholder="記事を検索..."
+          style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:4px;color:#e6edf3;font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:0.4rem 0.6rem;outline:none;"
+        />
       </div>
-      <div id="mobile-search-results" style="flex:1;overflow-y:auto;padding:0.5rem 0;font-family:'JetBrains Mono',monospace;"></div>
+      <div
+        id="mobile-search-results"
+        style="flex:1;overflow-y:auto;padding:0.5rem 0;font-family:'JetBrains Mono',monospace;"
+      >
+      </div>
     </div>
 
     <!-- モバイルナビ -->
     <nav class="mobile-nav">
       <a href="/" class={"mobile-nav-item" + (path === "/" ? " active" : "")}>
-        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M3 10L11 3L19 10V19H14V14H8V19H3V10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"
+          ><path
+            d="M3 10L11 3L19 10V19H14V14H8V19H3V10Z"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path></svg
+        >
         <span>Home</span>
       </a>
-      <a href="/blog" class={"mobile-nav-item" + (path.startsWith("/blog") ? " active" : "")}>
-        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><rect x="4" y="2" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="7.5" y1="8" x2="14.5" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7.5" y1="11.5" x2="14.5" y2="11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7.5" y1="15" x2="11.5" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <a
+        href="/blog"
+        class={"mobile-nav-item" + (path.startsWith("/blog") ? " active" : "")}
+      >
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"
+          ><rect
+            x="4"
+            y="2"
+            width="14"
+            height="18"
+            rx="2"
+            stroke="currentColor"
+            stroke-width="1.5"></rect><line
+            x1="7.5"
+            y1="8"
+            x2="14.5"
+            y2="8"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></line><line
+            x1="7.5"
+            y1="11.5"
+            x2="14.5"
+            y2="11.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></line><line
+            x1="7.5"
+            y1="15"
+            x2="11.5"
+            y2="15"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></line></svg
+        >
         <span>Blog</span>
       </a>
-      <a href="/about" class={"mobile-nav-item" + (path === "/about" ? " active" : "")}>
-        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M3 21C3 16.582 6.582 13 11 13C15.418 13 19 16.582 19 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <a
+        href="/about"
+        class={"mobile-nav-item" + (path === "/about" ? " active" : "")}
+      >
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"
+          ><circle cx="11" cy="8" r="4" stroke="currentColor" stroke-width="1.5"
+          ></circle><path
+            d="M3 21C3 16.582 6.582 13 11 13C15.418 13 19 16.582 19 21"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></path></svg
+        >
         <span>About</span>
       </a>
-      <button id="mobile-search-toggle" class="mobile-nav-item" style="background:none;cursor:pointer;flex:1;">
-        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.5"/><line x1="15" y1="15" x2="19" y2="19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <button
+        id="mobile-search-toggle"
+        class="mobile-nav-item"
+        style="background:none;cursor:pointer;flex:1;"
+      >
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"
+          ><circle
+            cx="10"
+            cy="10"
+            r="6.5"
+            stroke="currentColor"
+            stroke-width="1.5"></circle><line
+            x1="15"
+            y1="15"
+            x2="19"
+            y2="19"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></line></svg
+        >
         <span>Search</span>
       </button>
     </nav>
 
     <div class="vscode-workbench">
-
       <!-- アクティビティバー -->
       <div class="vscode-activitybar">
         <!-- Home -->
-        <a href="/" title="Home" class="activity-icon" style={path === "/" ? "color: #e6edf3;" : ""}>
+        <a
+          href="/"
+          title="Home"
+          class="activity-icon"
+          style={path === "/" ? "color: #e6edf3;" : ""}
+        >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <path d="M3 10L11 3L19 10V19H14V14H8V19H3V10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M3 10L11 3L19 10V19H14V14H8V19H3V10Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
           </svg>
         </a>
         <!-- Blog -->
-        <a href="/blog" title="Blog" class="activity-icon" style={path.startsWith("/blog") ? "color: #e6edf3;" : ""}>
+        <a
+          href="/blog"
+          title="Blog"
+          class="activity-icon"
+          style={path.startsWith("/blog") ? "color: #e6edf3;" : ""}
+        >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <rect x="4" y="2" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="7.5" y1="8" x2="14.5" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="7.5" y1="11.5" x2="14.5" y2="11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="7.5" y1="15" x2="11.5" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <rect
+              x="4"
+              y="2"
+              width="14"
+              height="18"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.5"></rect>
+            <line
+              x1="7.5"
+              y1="8"
+              x2="14.5"
+              y2="8"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"></line>
+            <line
+              x1="7.5"
+              y1="11.5"
+              x2="14.5"
+              y2="11.5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"></line>
+            <line
+              x1="7.5"
+              y1="15"
+              x2="11.5"
+              y2="15"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"></line>
           </svg>
         </a>
         <!-- About -->
-        <a href="/about" title="About" class="activity-icon" style={path === "/about" ? "color: #e6edf3;" : ""}>
+        <a
+          href="/about"
+          title="About"
+          class="activity-icon"
+          style={path === "/about" ? "color: #e6edf3;" : ""}
+        >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <circle cx="11" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M3 21C3 16.582 6.582 13 11 13C15.418 13 19 16.582 19 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle
+              cx="11"
+              cy="8"
+              r="4"
+              stroke="currentColor"
+              stroke-width="1.5"></circle>
+            <path
+              d="M3 21C3 16.582 6.582 13 11 13C15.418 13 19 16.582 19 21"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"></path>
           </svg>
         </a>
         <!-- Search -->
-        <button id="search-toggle" title="Search" class="activity-icon" style="background:none;border:none;cursor:pointer;padding:0;">
+        <button
+          id="search-toggle"
+          title="Search"
+          class="activity-icon"
+          style="background:none;border:none;cursor:pointer;padding:0;"
+        >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="15" y1="15" x2="19" y2="19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle
+              cx="10"
+              cy="10"
+              r="6.5"
+              stroke="currentColor"
+              stroke-width="1.5"></circle>
+            <line
+              x1="15"
+              y1="15"
+              x2="19"
+              y2="19"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"></line>
           </svg>
         </button>
       </div>
@@ -132,32 +297,71 @@ const filename =
         <div class="sidebar-section-title">EXPLORER</div>
         <div class="sidebar-tree">
           <!-- ~/ -->
-          <div class="sidebar-folder dir-toggle" data-target="dir-home" style="display:flex;align-items:center;gap:0.25rem;cursor:pointer;">
-            <span class="dir-arrow" data-target="dir-home" style="padding:0 0.25rem;">▾</span>
+          <div
+            class="sidebar-folder dir-toggle"
+            data-target="dir-home"
+            style="display:flex;align-items:center;gap:0.25rem;cursor:pointer;"
+          >
+            <span
+              class="dir-arrow"
+              data-target="dir-home"
+              style="padding:0 0.25rem;">▾</span
+            >
             <span style="flex:1;">~/</span>
           </div>
           <div id="dir-home">
-            <a href="/" class={"sidebar-file indent" + (path === "/" ? " active" : "")}>
+            <a
+              href="/"
+              class={"sidebar-file indent" + (path === "/" ? " active" : "")}
+            >
               <FileIcon /> home
             </a>
-            <a href="/about" class={"sidebar-file indent" + (path === "/about" ? " active" : "")}>
+            <a
+              href="/about"
+              class={"sidebar-file indent" +
+                (path === "/about" ? " active" : "")}
+            >
               <FileIcon /> about
             </a>
-            <a href="/blog" class={"sidebar-file indent" + (path === "/blog" ? " active" : "")}>
+            <a
+              href="/blog"
+              class={"sidebar-file indent" +
+                (path === "/blog" ? " active" : "")}
+            >
               <FileIcon /> blog
             </a>
           </div>
           <!-- blog/ -->
-          <div class="sidebar-folder dir-toggle" data-target="dir-blog" style="display:flex;align-items:center;gap:0.25rem;margin-top:0.25rem;cursor:pointer;">
-            <span class="dir-arrow" data-target="dir-blog" style="padding:0 0.25rem;">▾</span>
+          <div
+            class="sidebar-folder dir-toggle"
+            data-target="dir-blog"
+            style="display:flex;align-items:center;gap:0.25rem;margin-top:0.25rem;cursor:pointer;"
+          >
+            <span
+              class="dir-arrow"
+              data-target="dir-blog"
+              style="padding:0 0.25rem;">▾</span
+            >
             <span style="flex:1;">blog/</span>
           </div>
           <div id="dir-blog">
-            {allPosts.map((post) => (
-              <a href={`/blog/${post.id}`} class={"sidebar-file indent" + (path === `/blog/${post.id}` ? " active" : "")} title={post.data.title}>
-                <FileIcon /> <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{post.data.title}</span>
-              </a>
-            ))}
+            {
+              allPosts.map((post) => (
+                <a
+                  href={`/blog/${post.id}`}
+                  class={
+                    "sidebar-file indent" +
+                    (path === `/blog/${post.id}` ? " active" : "")
+                  }
+                  title={post.data.title}
+                >
+                  <FileIcon />{" "}
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    {post.data.title}
+                  </span>
+                </a>
+              ))
+            }
           </div>
         </div>
       </div>
@@ -173,18 +377,25 @@ const filename =
             style="width: 100%; box-sizing: border-box; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; color: #e6edf3; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; padding: 0.35rem 0.5rem; outline: none;"
           />
         </div>
-        <div id="search-results" class="sidebar-tree" style="padding: 0 0.25rem;"></div>
+        <div
+          id="search-results"
+          class="sidebar-tree"
+          style="padding: 0 0.25rem;"
+        >
+        </div>
       </div>
 
       <!-- エディタ＋ターミナル -->
       <div class="vscode-editor">
-
         <!-- タブバー -->
         <div class="vscode-tabs">
           <div class="vscode-tab active">
             <FileIcon />
             {filename}
-            <span style="color: #8b949e; margin-left: 0.5rem; font-size: 0.7rem;">✕</span>
+            <span
+              style="color: #8b949e; margin-left: 0.5rem; font-size: 0.7rem;"
+              >✕</span
+            >
           </div>
         </div>
 
@@ -200,74 +411,115 @@ const filename =
             <span class="terminal-panel-close">✕</span>
           </div>
           <div class="terminal-panel-body" id="term-output"></div>
-          <div style="display:flex;align-items:center;padding:0.2rem 0.75rem;border-top:1px solid #21262d;background:#0d1117;">
+          <div
+            style="display:flex;align-items:center;padding:0.2rem 0.75rem;border-top:1px solid #21262d;background:#0d1117;"
+          >
             <span class="t-user">ken@blog</span>
             <span class="t-sep">:</span>
             <span class="t-path" id="term-prompt-path">~</span>
             <span class="t-sep">$&nbsp;</span>
-            <input id="term-input" type="text" autocomplete="off" spellcheck="false"
-              style="flex:1;background:none;border:none;outline:none;color:#e6edf3;font-family:'JetBrains Mono',monospace;font-size:0.78rem;caret-color:#4ade80;caret-shape:block;" />
+            <input
+              id="term-input"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              style="flex:1;background:none;border:none;outline:none;color:#e6edf3;font-family:'JetBrains Mono',monospace;font-size:0.78rem;caret-color:#4ade80;caret-shape:block;"
+            />
           </div>
         </div>
 
         <!-- 仮想ファイルシステムデータ -->
-        <div id="vfs-data" style="display:none;" data-posts={JSON.stringify(allPosts.map(p => ({
-          id: p.id,
-          title: p.data.title,
-          description: p.data.description,
-          date: p.data.date.toISOString().slice(0, 10),
-          tags: p.data.tags,
-        })))}></div>
+        <div
+          id="vfs-data"
+          style="display:none;"
+          data-posts={JSON.stringify(
+            allPosts.map((p) => ({
+              id: p.id,
+              title: p.data.title,
+              description: p.data.description,
+              date: p.data.date.toISOString().slice(0, 10),
+              tags: p.data.tags,
+            })),
+          )}
+        >
+        </div>
 
         <!-- ステータスバー -->
         <footer class="vscode-statusbar">
           <div class="status-left">
-            <span class="status-item" style="background-color: #4ade80; color: #0d1117; padding: 0 0.75rem;">⎇ main</span>
+            <span
+              class="status-item"
+              style="background-color: #4ade80; color: #0d1117; padding: 0 0.75rem;"
+              >⎇ main</span
+            >
             <span class="status-item">✓ 0 errors</span>
           </div>
           <div class="status-right">
-            <span class="status-item">© {new Date().getFullYear()} ken.log</span>
+            <span class="status-item">© {new Date().getFullYear()} ken.log</span
+            >
           </div>
         </footer>
-
       </div>
     </div>
 
     <!-- ターミナルエミュレーター -->
     <script>
       (() => {
-        const output   = document.getElementById('term-output')!;
-        const input    = document.getElementById('term-input') as HTMLInputElement;
-        const promptPath = document.getElementById('term-prompt-path')!;
-        const vfsRaw = document.getElementById('vfs-data').dataset.posts;
+        const output = document.getElementById("term-output")!;
+        const input = document.getElementById("term-input") as HTMLInputElement;
+        const promptPath = document.getElementById("term-prompt-path")!;
+        const vfsRaw = document.getElementById("vfs-data").dataset.posts;
         const posts = JSON.parse(vfsRaw);
 
         // 仮想ファイルシステム
         const vfs: Record<string, Record<string, any>> = {
-          '~': {
-            'home.log':  { type: 'file', href: '/', title: "Ken's Blog", description: '30代のサラリーマンです' },
-            'about.log': { type: 'file', href: '/about', title: 'About', description: 'このブログについて' },
-            'blog':      { type: 'dir' },
+          "~": {
+            "home.log": {
+              type: "file",
+              href: "/",
+              title: "Ken's Blog",
+              description: "30代のサラリーマンです",
+            },
+            "about.log": {
+              type: "file",
+              href: "/about",
+              title: "About",
+              description: "このブログについて",
+            },
+            blog: { type: "dir" },
           },
-          '~/blog': Object.fromEntries(
-            posts.map(p => [`${p.id}.log`, { type: 'file', href: `/blog/${p.id}`, title: p.title, description: p.description, date: p.date, tags: p.tags }])
+          "~/blog": Object.fromEntries(
+            posts.map((p) => [
+              `${p.id}.log`,
+              {
+                type: "file",
+                href: `/blog/${p.id}`,
+                title: p.title,
+                description: p.description,
+                date: p.date,
+                tags: p.tags,
+              },
+            ]),
           ),
         };
 
-        let cwd = '~';
+        let cwd = "~";
         const history: string[] = [];
         let histIdx = -1;
 
         function print(html: string) {
-          const div = document.createElement('div');
-          div.className = 'terminal-line';
+          const div = document.createElement("div");
+          div.className = "terminal-line";
           div.innerHTML = html;
           output.appendChild(div);
           output.scrollTop = output.scrollHeight;
         }
 
         function esc(s: string) {
-          return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          return s
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
         }
 
         function updatePrompt() {
@@ -275,22 +527,36 @@ const filename =
         }
 
         function resolvePath(target: string): string | null {
-          if (target === '~' || target === '') return '~';
-          if (target === '..') return cwd === '~' ? '~' : '~';
-          if (target.startsWith('~/')) return target;
+          if (target === "~" || target === "") return "~";
+          if (target === "..") return cwd === "~" ? "~" : "~";
+          if (target.startsWith("~/")) return target;
           return `${cwd}/${target}`;
         }
 
         const commands: Record<string, (args: string[]) => void> = {
           help: () => {
             print(`<span class="t-green">利用可能なコマンド:</span>`);
-            print(`  <span class="t-muted">ls [path]</span>       ファイル一覧`);
-            print(`  <span class="t-muted">cd &lt;path&gt;</span>       ディレクトリ移動`);
-            print(`  <span class="t-muted">cat &lt;file&gt;</span>      ファイル内容を表示`);
-            print(`  <span class="t-muted">pwd</span>             現在のディレクトリ`);
-            print(`  <span class="t-muted">echo &lt;text&gt;</span>     テキストを出力`);
-            print(`  <span class="t-muted">open &lt;file&gt;</span>     ページを開く`);
-            print(`  <span class="t-muted">whoami</span>          ユーザー情報`);
+            print(
+              `  <span class="t-muted">ls [path]</span>       ファイル一覧`,
+            );
+            print(
+              `  <span class="t-muted">cd &lt;path&gt;</span>       ディレクトリ移動`,
+            );
+            print(
+              `  <span class="t-muted">cat &lt;file&gt;</span>      ファイル内容を表示`,
+            );
+            print(
+              `  <span class="t-muted">pwd</span>             現在のディレクトリ`,
+            );
+            print(
+              `  <span class="t-muted">echo &lt;text&gt;</span>     テキストを出力`,
+            );
+            print(
+              `  <span class="t-muted">open &lt;file&gt;</span>     ページを開く`,
+            );
+            print(
+              `  <span class="t-muted">whoami</span>          ユーザー情報`,
+            );
             print(`  <span class="t-muted">date</span>            現在日時`);
             print(`  <span class="t-muted">clear</span>           画面クリア`);
           },
@@ -298,13 +564,23 @@ const filename =
           ls: (args) => {
             const target = args[0] ? resolvePath(args[0]) : cwd;
             const dir = vfs[target!];
-            if (!dir) { print(`<span style="color:#f85149">ls: ${esc(args[0] ?? cwd)}: No such directory</span>`); return; }
-            const showAll = args.includes('-la') || args.includes('-l') || args.includes('-a');
+            if (!dir) {
+              print(
+                `<span style="color:#f85149">ls: ${esc(args[0] ?? cwd)}: No such directory</span>`,
+              );
+              return;
+            }
+            const showAll =
+              args.includes("-la") ||
+              args.includes("-l") ||
+              args.includes("-a");
             Object.entries(dir).forEach(([name, node]) => {
-              if (node.type === 'dir') {
+              if (node.type === "dir") {
                 print(`<span style="color:#58a6ff">${esc(name)}/</span>`);
               } else if (showAll) {
-                print(`<span class="t-muted">${node.date ?? '----------'}</span>  <span class="t-green">${esc(name)}</span>${node.title ? `  <span class="t-muted"># ${esc(node.title)}</span>` : ''}`);
+                print(
+                  `<span class="t-muted">${node.date ?? "----------"}</span>  <span class="t-green">${esc(name)}</span>${node.title ? `  <span class="t-muted"># ${esc(node.title)}</span>` : ""}`,
+                );
               } else {
                 print(`<span class="t-green">${esc(name)}</span>`);
               }
@@ -312,34 +588,69 @@ const filename =
           },
 
           cd: (args) => {
-            const target = args[0] ?? '~';
+            const target = args[0] ?? "~";
             const resolved = resolvePath(target)!;
-            if (resolved === '~' || vfs[resolved]) {
+            if (resolved === "~" || vfs[resolved]) {
               cwd = resolved;
               updatePrompt();
             } else {
               // ファイル名でのcdはエラー
               const parent = cwd;
-              const entry = vfs[parent]?.[target] ?? vfs[parent]?.[target + '.log'];
-              if (entry?.type === 'file') {
-                print(`<span style="color:#f85149">cd: ${esc(target)}: Not a directory</span>`);
+              const entry =
+                vfs[parent]?.[target] ?? vfs[parent]?.[target + ".log"];
+              if (entry?.type === "file") {
+                print(
+                  `<span style="color:#f85149">cd: ${esc(target)}: Not a directory</span>`,
+                );
               } else {
-                print(`<span style="color:#f85149">cd: ${esc(target)}: No such directory</span>`);
+                print(
+                  `<span style="color:#f85149">cd: ${esc(target)}: No such directory</span>`,
+                );
               }
             }
           },
 
           cat: (args) => {
-            if (!args[0]) { print(`<span style="color:#f85149">cat: ファイル名を指定してください</span>`); return; }
+            if (!args[0]) {
+              print(
+                `<span style="color:#f85149">cat: ファイル名を指定してください</span>`,
+              );
+              return;
+            }
             const name = args[0];
-            const entry = vfs[cwd]?.[name] ?? vfs[cwd]?.[name + '.log'];
-            if (!entry) { print(`<span style="color:#f85149">cat: ${esc(name)}: No such file</span>`); return; }
-            if (entry.type === 'dir') { print(`<span style="color:#f85149">cat: ${esc(name)}: Is a directory</span>`); return; }
-            if (entry.title) print(`<span class="t-muted">title: </span><span style="color:#e6edf3">${esc(entry.title)}</span>`);
-            if (entry.description) print(`<span class="t-muted">desc:  </span><span style="color:#e6edf3">${esc(entry.description)}</span>`);
-            if (entry.date) print(`<span class="t-muted">date:  </span><span style="color:#e6edf3">${esc(entry.date)}</span>`);
-            if (entry.tags?.length) print(`<span class="t-muted">tags:  </span>${entry.tags.map(t => `<span style="color:#58a6ff">#${esc(t)}</span>`).join(' ')}`);
-            if (entry.href) print(`<span class="t-muted">href:  </span><span style="color:#58a6ff">${esc(entry.href)}</span>`);
+            const entry = vfs[cwd]?.[name] ?? vfs[cwd]?.[name + ".log"];
+            if (!entry) {
+              print(
+                `<span style="color:#f85149">cat: ${esc(name)}: No such file</span>`,
+              );
+              return;
+            }
+            if (entry.type === "dir") {
+              print(
+                `<span style="color:#f85149">cat: ${esc(name)}: Is a directory</span>`,
+              );
+              return;
+            }
+            if (entry.title)
+              print(
+                `<span class="t-muted">title: </span><span style="color:#e6edf3">${esc(entry.title)}</span>`,
+              );
+            if (entry.description)
+              print(
+                `<span class="t-muted">desc:  </span><span style="color:#e6edf3">${esc(entry.description)}</span>`,
+              );
+            if (entry.date)
+              print(
+                `<span class="t-muted">date:  </span><span style="color:#e6edf3">${esc(entry.date)}</span>`,
+              );
+            if (entry.tags?.length)
+              print(
+                `<span class="t-muted">tags:  </span>${entry.tags.map((t) => `<span style="color:#58a6ff">#${esc(t)}</span>`).join(" ")}`,
+              );
+            if (entry.href)
+              print(
+                `<span class="t-muted">href:  </span><span style="color:#58a6ff">${esc(entry.href)}</span>`,
+              );
           },
 
           pwd: () => {
@@ -347,28 +658,46 @@ const filename =
           },
 
           echo: (args) => {
-            print(`<span style="color:#e6edf3">${esc(args.join(' '))}</span>`);
+            print(`<span style="color:#e6edf3">${esc(args.join(" "))}</span>`);
           },
 
           open: (args) => {
-            if (!args[0]) { print(`<span style="color:#f85149">open: ファイル名を指定してください</span>`); return; }
+            if (!args[0]) {
+              print(
+                `<span style="color:#f85149">open: ファイル名を指定してください</span>`,
+              );
+              return;
+            }
             const name = args[0];
-            const entry = vfs[cwd]?.[name] ?? vfs[cwd]?.[name + '.log'];
-            if (!entry?.href) { print(`<span style="color:#f85149">open: ${esc(name)}: Not found or no URL</span>`); return; }
-            print(`<span class="t-green">→ ${esc(entry.href)} を開いています...</span>`);
-            setTimeout(() => { window.location.href = entry.href!; }, 300);
+            const entry = vfs[cwd]?.[name] ?? vfs[cwd]?.[name + ".log"];
+            if (!entry?.href) {
+              print(
+                `<span style="color:#f85149">open: ${esc(name)}: Not found or no URL</span>`,
+              );
+              return;
+            }
+            print(
+              `<span class="t-green">→ ${esc(entry.href)} を開いています...</span>`,
+            );
+            setTimeout(() => {
+              window.location.href = entry.href!;
+            }, 300);
           },
 
           whoami: () => {
-            print(`<span style="color:#e6edf3">user</span> @ <span class="t-green">ken.log</span>`);
+            print(
+              `<span style="color:#e6edf3">user</span> @ <span class="t-green">ken.log</span>`,
+            );
           },
 
           date: () => {
-            print(`<span style="color:#e6edf3">${new Date().toString()}</span>`);
+            print(
+              `<span style="color:#e6edf3">${new Date().toString()}</span>`,
+            );
           },
 
           clear: () => {
-            output.innerHTML = '';
+            output.innerHTML = "";
           },
 
           Airi: () => {
@@ -378,17 +707,23 @@ const filename =
 
         function run(line: string) {
           const [cmd, ...args] = line.trim().split(/\s+/);
-          print(`<span class="t-user">ken@blog</span><span class="t-sep">:</span><span class="t-path">${cwd}</span><span class="t-sep">$</span> <span class="t-cmd">${esc(line)}</span>`);
+          print(
+            `<span class="t-user">ken@blog</span><span class="t-sep">:</span><span class="t-path">${cwd}</span><span class="t-sep">$</span> <span class="t-cmd">${esc(line)}</span>`,
+          );
           if (!cmd) return;
           if (commands[cmd]) {
             commands[cmd](args);
           } else {
-            print(`<span style="color:#f85149">${esc(cmd)}: command not found</span> <span class="t-muted">(try: help)</span>`);
+            print(
+              `<span style="color:#f85149">${esc(cmd)}: command not found</span> <span class="t-muted">(try: help)</span>`,
+            );
           }
         }
 
         // 起動メッセージ
-        print(`<span class="t-green">ken.log terminal</span> <span class="t-muted">— type <span style="color:#e6edf3">help</span> for available commands</span>`);
+        print(
+          `<span class="t-green">ken.log terminal</span> <span class="t-muted">— type <span style="color:#e6edf3">help</span> for available commands</span>`,
+        );
 
         const cmdNames = Object.keys(commands);
 
@@ -399,133 +734,187 @@ const filename =
           if (parts.length === 1) {
             // コマンド補完
             const partial = parts[0];
-            const matches = cmdNames.filter(c => c.startsWith(partial));
+            const matches = cmdNames.filter((c) => c.startsWith(partial));
             if (matches.length === 1) {
-              input.value = matches[0] + ' ';
+              input.value = matches[0] + " ";
             } else if (matches.length > 1) {
-              print(`<span class="t-user">ken@blog</span><span class="t-sep">:</span><span class="t-path">${cwd}</span><span class="t-sep">$</span> <span class="t-cmd">${esc(val)}</span>`);
-              print(matches.map(m => `<span class="t-green">${esc(m)}</span>`).join('  '));
+              print(
+                `<span class="t-user">ken@blog</span><span class="t-sep">:</span><span class="t-path">${cwd}</span><span class="t-sep">$</span> <span class="t-cmd">${esc(val)}</span>`,
+              );
+              print(
+                matches
+                  .map((m) => `<span class="t-green">${esc(m)}</span>`)
+                  .join("  "),
+              );
             }
           } else {
             // ファイル・ディレクトリ補完
             const partial = parts[parts.length - 1];
             const dir = vfs[cwd] ?? {};
-            const matches = Object.keys(dir).filter(f => f.startsWith(partial));
+            const matches = Object.keys(dir).filter((f) =>
+              f.startsWith(partial),
+            );
             if (matches.length === 1) {
               parts[parts.length - 1] = matches[0];
-              input.value = parts.join(' ');
+              input.value = parts.join(" ");
             } else if (matches.length > 1) {
-              print(`<span class="t-user">ken@blog</span><span class="t-sep">:</span><span class="t-path">${cwd}</span><span class="t-sep">$</span> <span class="t-cmd">${esc(val)}</span>`);
-              print(matches.map(m => `<span class="${dir[m].type === 'dir' ? 't-path' : 't-green'}">${esc(m)}</span>`).join('  '));
+              print(
+                `<span class="t-user">ken@blog</span><span class="t-sep">:</span><span class="t-path">${cwd}</span><span class="t-sep">$</span> <span class="t-cmd">${esc(val)}</span>`,
+              );
+              print(
+                matches
+                  .map(
+                    (m) =>
+                      `<span class="${dir[m].type === "dir" ? "t-path" : "t-green"}">${esc(m)}</span>`,
+                  )
+                  .join("  "),
+              );
             }
           }
         }
 
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
             const val = input.value.trim();
-            if (val) { history.unshift(val); histIdx = -1; }
+            if (val) {
+              history.unshift(val);
+              histIdx = -1;
+            }
             run(input.value);
-            input.value = '';
-          } else if (e.key === 'Tab') {
+            input.value = "";
+          } else if (e.key === "Tab") {
             e.preventDefault();
             tabComplete();
-          } else if (e.key === 'ArrowUp') {
+          } else if (e.key === "ArrowUp") {
             e.preventDefault();
-            if (histIdx < history.length - 1) { histIdx++; input.value = history[histIdx]; }
-          } else if (e.key === 'ArrowDown') {
+            if (histIdx < history.length - 1) {
+              histIdx++;
+              input.value = history[histIdx];
+            }
+          } else if (e.key === "ArrowDown") {
             e.preventDefault();
-            if (histIdx > 0) { histIdx--; input.value = history[histIdx]; }
-            else { histIdx = -1; input.value = ''; }
+            if (histIdx > 0) {
+              histIdx--;
+              input.value = history[histIdx];
+            } else {
+              histIdx = -1;
+              input.value = "";
+            }
           }
         });
 
         // ターミナルパネルクリックでinputにフォーカス
-        document.querySelector('.vscode-terminal-panel')?.addEventListener('click', () => input.focus());
+        document
+          .querySelector(".vscode-terminal-panel")
+          ?.addEventListener("click", () => input.focus());
       })();
     </script>
 
     <!-- ディレクトリトグル：開閉状態の即時復元（チラつき防止） -->
     <script is:inline>
-      ['dir-home', 'dir-blog'].forEach(function(id) {
-        if (localStorage.getItem('dir:' + id) === 'closed') {
+      ["dir-home", "dir-blog"].forEach(function (id) {
+        if (localStorage.getItem("dir:" + id) === "closed") {
           var el = document.getElementById(id);
-          if (el) el.style.display = 'none';
-          var arrow = document.querySelector('.dir-arrow[data-target="' + id + '"]');
-          if (arrow) arrow.textContent = '▸';
+          if (el) el.style.display = "none";
+          var arrow = document.querySelector(
+            '.dir-arrow[data-target="' + id + '"]',
+          );
+          if (arrow) arrow.textContent = "▸";
         }
       });
     </script>
     <!-- ディレクトリトグル：クリックイベント -->
     <script>
-      document.querySelectorAll('.dir-toggle').forEach((el) => {
-        const targetId = el.getAttribute('data-target')!;
+      document.querySelectorAll(".dir-toggle").forEach((el) => {
+        const targetId = el.getAttribute("data-target")!;
         const target = document.getElementById(targetId);
         if (!target) return;
 
-        el.addEventListener('click', () => {
-          const isOpen = target.style.display !== 'none';
-          target.style.display = isOpen ? 'none' : '';
-          const arrow = document.querySelector(`.dir-arrow[data-target="${targetId}"]`);
-          if (arrow) arrow.textContent = isOpen ? '▸' : '▾';
-          localStorage.setItem('dir:' + targetId, isOpen ? 'closed' : 'open');
+        el.addEventListener("click", () => {
+          const isOpen = target.style.display !== "none";
+          target.style.display = isOpen ? "none" : "";
+          const arrow = document.querySelector(
+            `.dir-arrow[data-target="${targetId}"]`,
+          );
+          if (arrow) arrow.textContent = isOpen ? "▸" : "▾";
+          localStorage.setItem("dir:" + targetId, isOpen ? "closed" : "open");
         });
       });
     </script>
 
     <!-- 検索 -->
     <script>
-      const toggle = document.getElementById('search-toggle');
-      const explorer = document.getElementById('panel-explorer');
-      const searchPanel = document.getElementById('panel-search');
-      const searchInput = document.getElementById('search-input') as HTMLInputElement;
-      const searchResults = document.getElementById('search-results');
+      const toggle = document.getElementById("search-toggle");
+      const explorer = document.getElementById("panel-explorer");
+      const searchPanel = document.getElementById("panel-search");
+      const searchInput = document.getElementById(
+        "search-input",
+      ) as HTMLInputElement;
+      const searchResults = document.getElementById("search-results");
 
-      type Post = { id: string; title: string; description: string; tags: string[]; date: string; body: string };
+      type Post = {
+        id: string;
+        title: string;
+        description: string;
+        tags: string[];
+        date: string;
+        body: string;
+      };
       let index: Post[] = [];
 
-      toggle?.addEventListener('click', async () => {
-        const isSearchOpen = searchPanel?.style.display !== 'none';
+      toggle?.addEventListener("click", async () => {
+        const isSearchOpen = searchPanel?.style.display !== "none";
         if (isSearchOpen) {
-          searchPanel!.style.display = 'none';
-          explorer!.style.display = '';
+          searchPanel!.style.display = "none";
+          explorer!.style.display = "";
         } else {
-          explorer!.style.display = 'none';
-          searchPanel!.style.display = '';
+          explorer!.style.display = "none";
+          searchPanel!.style.display = "";
           searchInput?.focus();
           if (index.length === 0) {
-            const res = await fetch('/search-index.json');
+            const res = await fetch("/search-index.json");
             index = await res.json();
-            renderResults('');
+            renderResults("");
           }
         }
       });
 
-      searchInput?.addEventListener('input', () => renderResults(searchInput.value));
+      searchInput?.addEventListener("input", () =>
+        renderResults(searchInput.value),
+      );
 
       // クエリ部分を蛍光緑でハイライト
       function highlight(text: string, query: string): string {
         if (!query) return escapeHtml(text);
-        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         return escapeHtml(text).replace(
-          new RegExp(escaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
-          m => `<mark style="background:rgba(74,222,128,0.2);color:#4ade80;border-radius:2px;padding:0 1px;">${m}</mark>`
+          new RegExp(escaped.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"),
+          (m) =>
+            `<mark style="background:rgba(74,222,128,0.2);color:#4ade80;border-radius:2px;padding:0 1px;">${m}</mark>`,
         );
       }
 
       function escapeHtml(s: string): string {
-        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
       }
 
       // マッチ周辺のスニペットを切り出す
       function snippet(body: string, query: string, radius = 60): string {
-        if (!query) return escapeHtml(body.slice(0, 80)) + (body.length > 80 ? '…' : '');
+        if (!query)
+          return escapeHtml(body.slice(0, 80)) + (body.length > 80 ? "…" : "");
         const idx = body.toLowerCase().indexOf(query.toLowerCase());
-        if (idx === -1) return escapeHtml(body.slice(0, 80)) + '…';
+        if (idx === -1) return escapeHtml(body.slice(0, 80)) + "…";
         const start = Math.max(0, idx - radius);
         const end = Math.min(body.length, idx + query.length + radius);
         const raw = body.slice(start, end);
-        return (start > 0 ? '…' : '') + highlight(raw, query) + (end < body.length ? '…' : '');
+        return (
+          (start > 0 ? "…" : "") +
+          highlight(raw, query) +
+          (end < body.length ? "…" : "")
+        );
       }
 
       function renderResults(query: string) {
@@ -533,126 +922,166 @@ const filename =
         const q = query.trim();
         const ql = q.toLowerCase();
 
-        const hits = ql === ''
-          ? index
-          : index.filter(p =>
-              p.title.toLowerCase().includes(ql) ||
-              p.body.toLowerCase().includes(ql) ||
-              p.tags.some(t => t.toLowerCase().includes(ql))
-            );
+        const hits =
+          ql === ""
+            ? index
+            : index.filter(
+                (p) =>
+                  p.title.toLowerCase().includes(ql) ||
+                  p.body.toLowerCase().includes(ql) ||
+                  p.tags.some((t) => t.toLowerCase().includes(ql)),
+              );
 
         if (hits.length === 0) {
-          searchResults.innerHTML = '<div style="padding:0.5rem 1rem;color:#8b949e;font-size:0.78rem;">見つかりませんでした</div>';
+          searchResults.innerHTML =
+            '<div style="padding:0.5rem 1rem;color:#8b949e;font-size:0.78rem;">見つかりませんでした</div>';
           return;
         }
 
-        searchResults.innerHTML = hits.map(p => {
-          const titleHit = p.title.toLowerCase().includes(ql);
-          const bodyHit  = p.body.toLowerCase().includes(ql);
+        searchResults.innerHTML = hits
+          .map((p) => {
+            const titleHit = p.title.toLowerCase().includes(ql);
+            const bodyHit = p.body.toLowerCase().includes(ql);
 
-          return `
+            return `
             <a href="/blog/${p.id}" style="display:block;padding:0.5rem 0.75rem;text-decoration:none;border-radius:4px;margin-bottom:2px;"
                onmouseover="this.style.background='#21262d'" onmouseout="this.style.background=''">
               <div style="color:#e6edf3;font-size:0.78rem;margin-bottom:0.15rem;line-height:1.4;">
                 ${highlight(p.title, q)}
               </div>
               <div style="color:#8b949e;font-size:0.68rem;margin-bottom:0.25rem;">${p.date}</div>
-              ${bodyHit && !titleHit
-                ? `<div style="color:#8b949e;font-size:0.7rem;line-height:1.5;border-left:2px solid #4ade80;padding-left:0.4rem;">${snippet(p.body, q)}</div>`
-                : ''
+              ${
+                bodyHit && !titleHit
+                  ? `<div style="color:#8b949e;font-size:0.7rem;line-height:1.5;border-left:2px solid #4ade80;padding-left:0.4rem;">${snippet(p.body, q)}</div>`
+                  : ""
               }
-              ${p.tags.length
-                ? `<div style="margin-top:0.25rem;">${p.tags.map(t => `<span style="color:${ql && t.toLowerCase().includes(ql) ? '#4ade80' : '#58a6ff'};font-size:0.68rem;margin-right:0.3rem;">#${t}</span>`).join('')}</div>`
-                : ''
+              ${
+                p.tags.length
+                  ? `<div style="margin-top:0.25rem;">${p.tags.map((t) => `<span style="color:${ql && t.toLowerCase().includes(ql) ? "#4ade80" : "#58a6ff"};font-size:0.68rem;margin-right:0.3rem;">#${t}</span>`).join("")}</div>`
+                  : ""
               }
             </a>
           `;
-        }).join('');
+          })
+          .join("");
       }
     </script>
 
     <!-- モバイル検索 -->
     <script>
-      const mobileToggle  = document.getElementById('mobile-search-toggle');
-      const mobileOverlay = document.getElementById('mobile-search-overlay') as HTMLElement;
-      const mobileInput   = document.getElementById('mobile-search-input') as HTMLInputElement;
-      const mobileResults = document.getElementById('mobile-search-results');
+      const mobileToggle = document.getElementById("mobile-search-toggle");
+      const mobileOverlay = document.getElementById(
+        "mobile-search-overlay",
+      ) as HTMLElement;
+      const mobileInput = document.getElementById(
+        "mobile-search-input",
+      ) as HTMLInputElement;
+      const mobileResults = document.getElementById("mobile-search-results");
 
       if (mobileToggle) {
-        type Post = { id: string; title: string; description: string; tags: string[]; date: string; body: string };
+        type Post = {
+          id: string;
+          title: string;
+          description: string;
+          tags: string[];
+          date: string;
+          body: string;
+        };
         let index: Post[] = [];
 
         function escHtml(s: string) {
-          return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          return s
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
         }
         function highlight(text: string, query: string): string {
           if (!query) return escHtml(text);
-          const esc = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          return escHtml(text).replace(new RegExp(esc, 'gi'),
-            m => `<mark style="background:rgba(74,222,128,0.2);color:#4ade80;border-radius:2px;padding:0 1px;">${m}</mark>`);
+          const esc = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          return escHtml(text).replace(
+            new RegExp(esc, "gi"),
+            (m) =>
+              `<mark style="background:rgba(74,222,128,0.2);color:#4ade80;border-radius:2px;padding:0 1px;">${m}</mark>`,
+          );
         }
         function snippet(body: string, query: string, radius = 60): string {
-          if (!query) return escHtml(body.slice(0, 80)) + (body.length > 80 ? '…' : '');
+          if (!query)
+            return escHtml(body.slice(0, 80)) + (body.length > 80 ? "…" : "");
           const idx = body.toLowerCase().indexOf(query.toLowerCase());
-          if (idx === -1) return escHtml(body.slice(0, 80)) + '…';
+          if (idx === -1) return escHtml(body.slice(0, 80)) + "…";
           const start = Math.max(0, idx - radius);
           const end = Math.min(body.length, idx + query.length + radius);
-          return (start > 0 ? '…' : '') + highlight(body.slice(start, end), query) + (end < body.length ? '…' : '');
+          return (
+            (start > 0 ? "…" : "") +
+            highlight(body.slice(start, end), query) +
+            (end < body.length ? "…" : "")
+          );
         }
         function renderMobileResults(query: string) {
           if (!mobileResults) return;
           const q = query.trim();
           const ql = q.toLowerCase();
-          const hits = ql === '' ? index : index.filter(p =>
-            p.title.toLowerCase().includes(ql) ||
-            p.body.toLowerCase().includes(ql) ||
-            p.tags.some(t => t.toLowerCase().includes(ql))
-          );
+          const hits =
+            ql === ""
+              ? index
+              : index.filter(
+                  (p) =>
+                    p.title.toLowerCase().includes(ql) ||
+                    p.body.toLowerCase().includes(ql) ||
+                    p.tags.some((t) => t.toLowerCase().includes(ql)),
+                );
           if (hits.length === 0) {
-            mobileResults.innerHTML = '<div style="padding:1rem;color:#8b949e;font-size:0.82rem;">見つかりませんでした</div>';
+            mobileResults.innerHTML =
+              '<div style="padding:1rem;color:#8b949e;font-size:0.82rem;">見つかりませんでした</div>';
             return;
           }
-          mobileResults.innerHTML = hits.map(p => {
-            const bodyHit = p.body.toLowerCase().includes(ql);
-            const titleHit = p.title.toLowerCase().includes(ql);
-            return `
+          mobileResults.innerHTML = hits
+            .map((p) => {
+              const bodyHit = p.body.toLowerCase().includes(ql);
+              const titleHit = p.title.toLowerCase().includes(ql);
+              return `
               <a href="/blog/${p.id}" style="display:block;padding:0.75rem 1rem;text-decoration:none;border-bottom:1px solid #21262d;">
                 <div style="color:#e6edf3;font-size:0.85rem;margin-bottom:0.2rem;">${highlight(p.title, q)}</div>
                 <div style="color:#8b949e;font-size:0.72rem;margin-bottom:0.3rem;">${p.date}</div>
-                ${bodyHit && !titleHit ? `<div style="color:#8b949e;font-size:0.75rem;line-height:1.5;border-left:2px solid #4ade80;padding-left:0.4rem;">${snippet(p.body, q)}</div>` : ''}
-                ${p.tags.length ? `<div style="margin-top:0.3rem;">${p.tags.map(t => `<span style="color:${ql && t.toLowerCase().includes(ql) ? '#4ade80' : '#58a6ff'};font-size:0.7rem;margin-right:0.3rem;">#${t}</span>`).join('')}</div>` : ''}
+                ${bodyHit && !titleHit ? `<div style="color:#8b949e;font-size:0.75rem;line-height:1.5;border-left:2px solid #4ade80;padding-left:0.4rem;">${snippet(p.body, q)}</div>` : ""}
+                ${p.tags.length ? `<div style="margin-top:0.3rem;">${p.tags.map((t) => `<span style="color:${ql && t.toLowerCase().includes(ql) ? "#4ade80" : "#58a6ff"};font-size:0.7rem;margin-right:0.3rem;">#${t}</span>`).join("")}</div>` : ""}
               </a>`;
-          }).join('');
+            })
+            .join("");
         }
 
         let prevActive: Element | null = null;
 
         async function openMobileSearch() {
-          const nav = document.querySelector('.mobile-nav') as HTMLElement;
-          mobileOverlay.style.top = (nav?.offsetHeight ?? 0) + 'px';
-          mobileOverlay.style.display = 'flex';
-          prevActive = nav?.querySelector('.mobile-nav-item.active') ?? null;
-          prevActive?.classList.remove('active');
-          mobileToggle.classList.add('active');
+          const nav = document.querySelector(".mobile-nav") as HTMLElement;
+          mobileOverlay.style.top = (nav?.offsetHeight ?? 0) + "px";
+          mobileOverlay.style.display = "flex";
+          prevActive = nav?.querySelector(".mobile-nav-item.active") ?? null;
+          prevActive?.classList.remove("active");
+          mobileToggle.classList.add("active");
           if (index.length === 0) {
-            const res = await fetch('/search-index.json');
+            const res = await fetch("/search-index.json");
             index = await res.json();
-            renderMobileResults('');
+            renderMobileResults("");
           }
           setTimeout(() => mobileInput.focus(), 50);
         }
         function closeMobileSearch() {
-          mobileOverlay.style.display = 'none';
-          mobileInput.value = '';
-          mobileToggle.classList.remove('active');
-          prevActive?.classList.add('active');
+          mobileOverlay.style.display = "none";
+          mobileInput.value = "";
+          mobileToggle.classList.remove("active");
+          prevActive?.classList.add("active");
           prevActive = null;
         }
 
-        mobileToggle.addEventListener('click', () => {
-          mobileOverlay.style.display === 'none' ? openMobileSearch() : closeMobileSearch();
+        mobileToggle.addEventListener("click", () => {
+          mobileOverlay.style.display === "none"
+            ? openMobileSearch()
+            : closeMobileSearch();
         });
-        mobileInput.addEventListener('input', () => renderMobileResults(mobileInput.value));
+        mobileInput.addEventListener("input", () =>
+          renderMobileResults(mobileInput.value),
+        );
       }
     </script>
 

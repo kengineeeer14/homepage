@@ -69,26 +69,6 @@ const posts = (await getCollection("blog"))
       </div>
       <div style="color: #8b949e; font-size: 0.8rem;">articles</div>
     </div>
-    <div style="width: 1px; background: #30363d;"></div>
-    <div>
-      <div
-        id="today-views"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #3fb950; font-weight: 600;"
-      >
-        -
-      </div>
-      <div style="color: #8b949e; font-size: 0.8rem;">today views</div>
-    </div>
-    <div style="width: 1px; background: #30363d;"></div>
-    <div>
-      <div
-        id="total-views"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; color: #d2a8ff; font-weight: 600;"
-      >
-        -
-      </div>
-      <div style="color: #8b949e; font-size: 0.8rem;">total views</div>
-    </div>
   </div>
 
   <!-- 最新記事 -->
@@ -146,29 +126,3 @@ const posts = (await getCollection("blog"))
     border-color: #58a6ff !important;
   }
 </style>
-
-<script>
-  function updateViewCounts() {
-    const today = new Date().toISOString().split("T")[0];
-    const todayKey = `views_${today}`;
-
-    let todayViews = parseInt(localStorage.getItem(todayKey) || "0");
-    let totalViews = parseInt(localStorage.getItem("totalViews") || "0");
-
-    // ページビューをカウント
-    todayViews++;
-    totalViews++;
-
-    localStorage.setItem(todayKey, todayViews);
-    localStorage.setItem("totalViews", totalViews);
-
-    // DOMを更新
-    const todayViewsEl = document.getElementById("today-views");
-    const totalViewsEl = document.getElementById("total-views");
-
-    if (todayViewsEl) todayViewsEl.textContent = todayViews;
-    if (totalViewsEl) totalViewsEl.textContent = totalViews;
-  }
-
-  updateViewCounts();
-</script>

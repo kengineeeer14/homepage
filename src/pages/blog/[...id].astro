@@ -311,10 +311,14 @@ const { Content } = await render(post);
   });
   function closePicker() { picker.style.display = "none"; }
 
-  // リアクションピルを作成・更新
+  // リアクションピルを作成・更新（count=0なら削除）
   function upsertPill(emoji, count) {
     const id = `pill-${[...emoji].map(c => c.codePointAt(0).toString(16)).join("-")}`;
     let pill = document.getElementById(id);
+    if (count === 0) {
+      pill?.remove();
+      return;
+    }
     if (!pill) {
       pill = document.createElement("button");
       pill.id = id;
@@ -335,17 +339,21 @@ const { Content } = await render(post);
     pill.innerHTML = `<span>${emoji}</span><span style="font-size:0.78rem; color:${active ? "#58a6ff" : "#8b949e"}; font-family:'JetBrains Mono',monospace;">${count}</span>`;
   }
 
-  // リアクション送信
+  // リアクション送信（トグル対応）
   async function sendReaction(emoji) {
-    if (reacted.has(emoji)) return;
+    const removing = reacted.has(emoji);
     try {
       const res = await fetch(`/api/reactions?post=${encodeURIComponent(postId)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emoji }),
+        body: JSON.stringify({ emoji, remove: removing }),
       });
       const data = await res.json();
-      reacted.add(emoji);
+      if (removing) {
+        reacted.delete(emoji);
+      } else {
+        reacted.add(emoji);
+      }
       localStorage.setItem(storageKey, JSON.stringify([...reacted]));
       upsertPill(emoji, data.count);
     } catch {}

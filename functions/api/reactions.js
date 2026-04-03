@@ -32,10 +32,11 @@ export async function onRequestPost(context) {
   const url = new URL(context.request.url);
   const postId = url.searchParams.get("post");
 
-  let emoji;
+  let emoji, remove;
   try {
     const body = await context.request.json();
     emoji = body.emoji;
+    remove = body.remove === true;
   } catch {
     return new Response(JSON.stringify({ error: "invalid JSON body" }), {
       status: 400,
@@ -59,7 +60,7 @@ export async function onRequestPost(context) {
   }
 
   if (!kv) {
-    return new Response(JSON.stringify({ emoji, count: 1 }), {
+    return new Response(JSON.stringify({ emoji, count: remove ? 0 : 1 }), {
       headers: { "Content-Type": "application/json" },
     });
   }
@@ -67,7 +68,12 @@ export async function onRequestPost(context) {
   const key = kvKey(postId);
   const raw = await kv.get(key);
   const data = raw ? JSON.parse(raw) : {};
-  data[emoji] = (data[emoji] ?? 0) + 1;
+  if (remove) {
+    data[emoji] = Math.max(0, (data[emoji] ?? 0) - 1);
+    if (data[emoji] === 0) delete data[emoji];
+  } else {
+    data[emoji] = (data[emoji] ?? 0) + 1;
+  }
   await kv.put(key, JSON.stringify(data));
 
   return new Response(JSON.stringify({ emoji, count: data[emoji] }), {

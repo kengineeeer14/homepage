@@ -76,6 +76,39 @@ https://homepage-3pk.pages.dev
 
 ---
 
+## 4. アクセス数カウンターのセットアップ（初回のみ）
+
+ホーム画面に「today」「total visits」を表示するために、Cloudflare KV の設定が必要です。
+
+### KV ネームスペースの作成
+
+```bash
+CLOUDFLARE_API_TOKEN='あなたのAPIトークン' npx wrangler kv namespace create VISITS_KV
+```
+
+成功すると以下のように表示されます。
+
+```
+{ binding = "VISITS_KV", id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" }
+```
+
+表示された **id** をメモしておきます。
+
+### Cloudflare ダッシュボードで KV バインドを設定
+
+1. https://dash.cloudflare.com にログイン
+2. **Workers & Pages** → **homepage** プロジェクトを選択
+3. **設定** → **Functions** → **KV namespace bindings**
+4. **Add binding** をクリック
+5. Variable name: `VISITS_KV`、KV namespace: 先ほど作成したネームスペースを選択
+6. **Save** をクリック
+
+設定後、次回のデプロイから `today` / `total visits` の値が表示されます。
+
+> ローカル開発中（`npm run dev`）はカウンターは動作せず、「—」と表示されます。これは正常です。
+
+---
+
 ## まとめ：毎回の作業フロー
 
 ```

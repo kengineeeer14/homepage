@@ -162,6 +162,10 @@ a.mobile-nav-item.active:visited { color: #4ade80; }
   button.mobile-nav-item {
     border: none;
   }
+  button.mobile-nav-item.active {
+    color: #4ade80;
+    border-bottom: 2px solid #4ade80;
+  }
 
   /* ヒーローセクションのアイコン調整 */
   section[style*="flex"] {

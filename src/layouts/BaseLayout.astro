@@ -1085,6 +1085,24 @@ const filename =
       }
     </script>
 
+    <!-- アクセス数トラッキング -->
+    <script>
+      const today = new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" });
+      const counted = localStorage.getItem("visited");
+      if (counted !== today) {
+        fetch("/api/visits")
+          .then((r) => r.json())
+          .then((data) => {
+            localStorage.setItem("visited", today);
+            const todayEl = document.getElementById("visits-today");
+            const totalEl = document.getElementById("visits-total");
+            if (todayEl && data.today != null) todayEl.textContent = data.today.toLocaleString();
+            if (totalEl && data.total != null) totalEl.textContent = data.total.toLocaleString();
+          })
+          .catch(() => {});
+      }
+    </script>
+
     <!-- コードブロックにコピーボタンを追加 -->
     <script>
       document.querySelectorAll("pre").forEach((pre) => {

@@ -164,6 +164,7 @@ const { Content } = await render(post);
   const BANANA = "🍌";
 
   const storageKey = `reactions2:${postId}`;
+  const countCacheKey = `reaction-counts2:${postId}`;
   const reacted = new Set(JSON.parse(localStorage.getItem(storageKey) ?? "[]"));
 
   const list = document.getElementById("reaction-list");
@@ -216,14 +217,32 @@ const { Content } = await render(post);
         reacted.add(emoji);
       }
       localStorage.setItem(storageKey, JSON.stringify([...reacted]));
+      // カウントをキャッシュに保存
+      const counts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
+      if (data.count === 0) {
+        delete counts[emoji];
+      } else {
+        counts[emoji] = data.count;
+      }
+      localStorage.setItem(countCacheKey, JSON.stringify(counts));
       upsertPill(emoji, data.count);
     } catch {}
   }
 
-  // 初期ロード
+  // 初期ロード：まずキャッシュを表示してからサーバーで更新
+  const cachedCounts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
+  for (const [emoji, count] of Object.entries(cachedCounts)) {
+    upsertPill(emoji, count);
+  }
+
   fetch(`/api/reactions?post=${encodeURIComponent(postId)}`)
     .then(r => r.json())
     .then(data => {
+      localStorage.setItem(countCacheKey, JSON.stringify(data));
+      // サーバーにないピルを削除
+      for (const emoji of Object.keys(cachedCounts)) {
+        if (!(emoji in data)) upsertPill(emoji, 0);
+      }
       for (const [emoji, count] of Object.entries(data)) {
         upsertPill(emoji, count);
       }

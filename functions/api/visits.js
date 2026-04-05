@@ -1,5 +1,6 @@
 export async function onRequestGet(context) {
   const kv = context.env.VISITS_KV;
+  const readonly = new URL(context.request.url).searchParams.get("readonly") === "1";
 
   if (!kv) {
     return new Response(JSON.stringify({ today: null, total: null }), {
@@ -14,6 +15,12 @@ export async function onRequestGet(context) {
     kv.get(todayKey),
     kv.get("total"),
   ]);
+
+  if (readonly) {
+    return new Response(JSON.stringify({ today: parseInt(todayStr ?? "0"), total: parseInt(totalStr ?? "0") }), {
+      headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+    });
+  }
 
   const todayCount = parseInt(todayStr ?? "0") + 1;
   const totalCount = parseInt(totalStr ?? "0") + 1;

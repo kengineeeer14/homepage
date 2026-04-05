@@ -1089,13 +1089,25 @@ const filename =
     <script>
       const today = new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" });
       const counted = localStorage.getItem("visited");
+      const todayEl = document.getElementById("visits-today");
+      const totalEl = document.getElementById("visits-total");
+      const hasDisplay = todayEl || totalEl;
+
       if (counted !== today) {
+        // 未カウントの場合はカウントアップ
         fetch("/api/visits")
           .then((r) => r.json())
           .then((data) => {
             localStorage.setItem("visited", today);
-            const todayEl = document.getElementById("visits-today");
-            const totalEl = document.getElementById("visits-total");
+            if (todayEl && data.today != null) todayEl.textContent = data.today.toLocaleString();
+            if (totalEl && data.total != null) totalEl.textContent = data.total.toLocaleString();
+          })
+          .catch(() => {});
+      } else if (hasDisplay) {
+        // 既にカウント済みでも表示要素があれば読み取り専用で取得
+        fetch("/api/visits?readonly=1")
+          .then((r) => r.json())
+          .then((data) => {
             if (todayEl && data.today != null) todayEl.textContent = data.today.toLocaleString();
             if (totalEl && data.total != null) totalEl.textContent = data.total.toLocaleString();
           })

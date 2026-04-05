@@ -173,6 +173,12 @@ const { Content } = await render(post);
   // バナナボタンをクリックで直接送信
   addBtn.addEventListener("click", () => { sendReaction(BANANA); });
 
+  // 既にバナナをあげていたらボタンを非表示
+  function updateAddBtn() {
+    addBtn.style.display = reacted.has(BANANA) ? "none" : "inline-flex";
+  }
+  updateAddBtn();
+
   // リアクションピルを作成・更新（count=0なら削除）
   function upsertPill(emoji, count) {
     const id = `pill-${[...emoji].map(c => c.codePointAt(0).toString(16)).join("-")}`;
@@ -215,6 +221,7 @@ const { Content } = await render(post);
     }
     localStorage.setItem(storageKey, JSON.stringify([...reacted]));
     upsertPill(emoji, optimisticCount);
+    updateAddBtn();
     try {
       const res = await fetch(`/api/reactions?post=${encodeURIComponent(postId)}`, {
         method: "POST",
@@ -239,6 +246,7 @@ const { Content } = await render(post);
       }
       localStorage.setItem(storageKey, JSON.stringify([...reacted]));
       upsertPill(emoji, prevCount);
+      updateAddBtn();
     }
   }
 

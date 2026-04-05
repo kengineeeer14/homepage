@@ -80,33 +80,14 @@ const { Content } = await render(post);
         <!-- リアクションピルはJSで動的に挿入 -->
         <button
           id="add-reaction-btn"
-          title="リアクションを追加"
+          title="バナナをあげる"
           style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.65rem; background: #0d1117; border: 1px solid #30363d; border-radius: 20px; color: #8b949e; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: border-color 0.2s, color 0.2s, box-shadow 0.2s; flex-shrink: 0;"
           onmouseenter="this.style.borderColor='#58a6ff';this.style.color='#58a6ff';this.style.boxShadow='0 0 0 3px rgba(88,166,255,0.15)'"
           onmouseleave="this.style.borderColor='#30363d';this.style.color='#8b949e';this.style.boxShadow='none'"
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
-            <circle cx="5.5" cy="6.5" r="1" fill="currentColor"/>
-            <circle cx="10.5" cy="6.5" r="1" fill="currentColor"/>
-            <path d="M5.5 10.5 C6.2 12 9.8 12 10.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M12 3v2.5M10.75 4.25h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          </svg>
-          <span>反応する</span>
+          <span>🍌</span>
+          <span>バナナをあげる</span>
         </button>
-      </div>
-
-      <!-- 絵文字ピッカー -->
-      <div
-        id="emoji-picker"
-        style="display: none; position: absolute; z-index: 100; bottom: calc(100% + 8px); left: 0; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 0.75rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5); width: min(340px, 90vw);"
-      >
-        <!-- デフォルト3つ -->
-        <div id="emoji-quick" style="display: flex; gap: 4px; margin-bottom: 0.5rem;"></div>
-        <!-- 展開ボタン -->
-        <button id="emoji-expand-btn" style="width: 100%; background: none; border: 1px solid #30363d; border-radius: 4px; color: #8b949e; font-size: 0.78rem; padding: 0.25rem; cursor: pointer; font-family: 'JetBrains Mono', monospace;">もっと見る ▾</button>
-        <!-- 全絵文字グリッド（折りたたみ） -->
-        <div id="emoji-grid" style="display: none; grid-template-columns: repeat(8, 1fr); gap: 2px; margin-top: 0.5rem; max-height: 240px; overflow-y: auto;"></div>
       </div>
     </div>
 
@@ -180,136 +161,16 @@ const { Content } = await render(post);
   </article>
 
 <script define:vars={{ postId: post.id }}>
-  const EMOJIS = [
-    // 笑顔・表情
-    "😀","😃","😄","😁","😆","😅","🤣","😂",
-    "🙂","🙃","😉","😊","😇","🥰","😍","🤩",
-    "😘","😋","😛","😜","🤪","😝","🤑","🤗",
-    "🤔","🤨","😐","😑","😶","😏","😒","🙄",
-    "😬","😌","😔","😪","🤤","😴","😷","🤒",
-    "🤢","🤮","🤧","🥵","🥶","😵","🤯","🥳",
-    "😎","🤓","🧐","😕","😟","😮","😱","😭",
-    "😤","😡","😠","🤬","😈","👿","💀","🤡",
-    // 手・体
-    "👋","🤚","✋","🖐️","🖖","👌","✌️","🤞",
-    "🤟","🤘","🤙","👍","👎","👏","🙌","🙏",
-    "💪","🤝","🫶","🫂","👀","💋","✍️","💅",
-    // 動物
-    "🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼",
-    "🐨","🐯","🦁","🐮","🐷","🐸","🐵","🙈",
-    "🐔","🐧","🐦","🦆","🦅","🦉","🦇","🐺",
-    "🐴","🦄","🐝","🦋","🐛","🐌","🐞","🐜",
-    "🐢","🐍","🦎","🐙","🦑","🐟","🐬","🐋",
-    "🦈","🐊","🦏","🐘","🦒","🦘","🦬","🐃",
-    "🦍","🦧","🐪","🦓","🐅","🐆","🐕","🐈",
-    "🐓","🦃","🦚","🦜","🦢","🦩","🕊️","🐇",
-    // 食べ物
-    "🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓",
-    "🫐","🍒","🍑","🥭","🍍","🥥","🥝","🍅",
-    "🍆","🥑","🥦","🥕","🌽","🌶️","🥒","🧄",
-    "🍕","🍔","🍟","🌭","🌮","🌯","🥪","🍜",
-    "🍣","🍱","🍛","🍩","🍰","🎂","🍫","🍭",
-    "🍿","🧁","🍪","🍯","🥐","🧀","🥚","🍳",
-    "☕","🍵","🧃","🥤","🧋","🍺","🍷","🥂",
-    "🍸","🍹","🍾","🧊","🫖","🥛","🍼","🍻",
-    // 乗り物・場所
-    "🚗","🚕","🚙","🚌","🏎️","🚓","🚑","🚒",
-    "🚲","🛴","🛹","🛻","✈️","🚀","🚁","🛸",
-    "🚢","⛵","🚤","🛥️","🏔️","🌋","🏕️","🏖️",
-    "🏝️","🏠","🏢","🏛️","🏰","🗼","🗽","⛩️",
-    "🌉","🌆","🌇","🌃","🌌","🌅","🌄","🎑",
-    // スポーツ・活動
-    "⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱",
-    "🏒","⛳","🎣","🥊","🥋","🎽","🛷","⛸️",
-    "🏋️","🤸","🏄","🚣","🧘","⛹️","🤾","🏇",
-    "🏆","🥇","🥈","🥉","🎖️","🏅","🎪","🎠",
-    // 音楽・エンタメ
-    "🎮","🕹️","🎲","♟️","🃏","🎴","🎰","🎯",
-    "🎨","🎭","🎬","🎤","🎧","🎼","🎵","🎶",
-    "🎷","🎸","🎹","🎺","🎻","🥁","🪘","🎙️",
-    // テクノロジー・道具
-    "💻","🖥️","🖨️","⌨️","🖱️","📱","📲","☎️",
-    "📺","📷","📸","📹","🎥","📡","🔋","🔌",
-    "💡","🔦","🕯️","💰","💳","💸","📈","📉",
-    "📝","📋","📌","📍","📎","✂️","🔒","🔓",
-    "🔑","🗝️","🔨","🔧","🔩","⚙️","🛠️","🔭",
-    "🔬","💊","🩺","🩹","🧪","⚗️","🔮","🧿",
-    "📚","📖","📰","📜","📃","📄","📑","🗒️",
-    "✉️","📧","📨","📩","📬","📭","📮","🗳️",
-    // 自然・天気
-    "🌍","🌎","🌏","🌙","⭐","🌟","💫","✨",
-    "⚡","🌈","☁️","🌤️","🌧️","🌩️","❄️","🔥",
-    "💧","🌊","🌱","🌿","☘️","🍀","🌷","🌹",
-    "🥀","🌺","🌸","🌼","🌻","🌞","🍄","🌾",
-    "🍁","🍂","🍃","🌵","🎋","🎍","🪨","🌴",
-    // ハート・シンボル
-    "❤️","🧡","💛","💚","💙","💜","🖤","🤍",
-    "🤎","💔","💕","💞","💓","💗","💖","💘",
-    "💝","💟","☮️","✝️","☪️","🕉️","☯️","✡️",
-    "♻️","✅","❌","⭕","⚠️","💯","🔞","🚫",
-    "🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪",
-    // お祝い・イベント
-    "🎁","🎀","🎗️","🎟️","🎫","🎈","🎃","🎄",
-    "🎆","🎇","🧨","🎉","🎊","🎋","🎍","🎑",
-    "🪄","🎩","👑","💎","🪆","🪅","🃏","🀄",
-  ];
-
-  const QUICK_EMOJIS = ["👍", "❤️", "💡"];
+  const BANANA = "🍌";
 
   const storageKey = `reactions2:${postId}`;
   const reacted = new Set(JSON.parse(localStorage.getItem(storageKey) ?? "[]"));
 
   const list = document.getElementById("reaction-list");
   const addBtn = document.getElementById("add-reaction-btn");
-  const picker = document.getElementById("emoji-picker");
-  const quickRow = document.getElementById("emoji-quick");
-  const grid = document.getElementById("emoji-grid");
-  const expandBtn = document.getElementById("emoji-expand-btn");
 
-  // クイック絵文字ボタンを構築
-  function makeEmojiBtn(emoji, large) {
-    const btn = document.createElement("button");
-    btn.textContent = emoji;
-    btn.style.cssText = `background:none; border:none; cursor:pointer; font-size:${large ? "1.6rem" : "1.25rem"}; padding:0.3rem; border-radius:4px; transition:background 0.1s; line-height:1;`;
-    btn.addEventListener("mouseenter", () => { btn.style.background = "#161b22"; });
-    btn.addEventListener("mouseleave", () => { btn.style.background = "none"; });
-    btn.addEventListener("click", () => { sendReaction(emoji); closePicker(); });
-    return btn;
-  }
-
-  for (const emoji of QUICK_EMOJIS) {
-    quickRow.appendChild(makeEmojiBtn(emoji, true));
-  }
-
-  // 全絵文字グリッドを構築（遅延）
-  let gridBuilt = false;
-  expandBtn.addEventListener("click", () => {
-    const expanded = grid.style.display === "grid";
-    if (expanded) {
-      grid.style.display = "none";
-      expandBtn.textContent = "もっと見る ▾";
-    } else {
-      if (!gridBuilt) {
-        for (const emoji of EMOJIS) {
-          grid.appendChild(makeEmojiBtn(emoji, false));
-        }
-        gridBuilt = true;
-      }
-      grid.style.display = "grid";
-      expandBtn.textContent = "閉じる ▴";
-    }
-  });
-
-  // ピッカー開閉
-  addBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const isOpen = picker.style.display !== "none";
-    picker.style.display = isOpen ? "none" : "block";
-  });
-  document.addEventListener("click", (e) => {
-    if (!picker.contains(e.target) && e.target !== addBtn) closePicker();
-  });
-  function closePicker() { picker.style.display = "none"; }
+  // バナナボタンをクリックで直接送信
+  addBtn.addEventListener("click", () => { sendReaction(BANANA); });
 
   // リアクションピルを作成・更新（count=0なら削除）
   function upsertPill(emoji, count) {

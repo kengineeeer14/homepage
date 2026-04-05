@@ -10,7 +10,7 @@ services:
     working_dir: /app
     stdin_open: true
     tty: true
-    command: npm run dev -- --host 0.0.0.0
+    command: npm run dev:pages
 
 volumes:
   node_modules:

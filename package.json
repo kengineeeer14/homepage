@@ -7,8 +7,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "dev:pages": "astro dev --port 4322 & npx wrangler pages dev --proxy 4322 --port 4321 --ip 0.0.0.0 --kv VISITS_KV --persist-to .wrangler/state",
-    "build": "astro build",
+    "dev:pages": "sh scripts/kill-dev.sh && astro dev --host --port 4322 & sleep 3 && npx wrangler pages dev --proxy 4322 --port 4321 --ip 0.0.0.0 --kv VISITS_KV --persist-to .wrangler/state",
+    "build": "astro build && cp -r functions dist/functions",
     "preview": "astro preview",
     "astro": "astro"
   },

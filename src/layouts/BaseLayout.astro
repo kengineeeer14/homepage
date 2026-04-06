@@ -414,10 +414,11 @@ const filename =
           <div
             style="display:flex;align-items:center;padding:0.2rem 0.75rem;border-top:1px solid #21262d;background:#0d1117;"
           >
-            <span class="t-user">ken@blog</span>
-            <span class="t-sep">:</span>
-            <span class="t-path" id="term-prompt-path">~</span>
-            <span class="t-sep">$&nbsp;</span>
+            <span class="t-user term-prompt-part">ken@blog</span>
+            <span class="t-sep term-prompt-part">:</span>
+            <span class="t-path term-prompt-part" id="term-prompt-path">~</span>
+            <span class="t-sep term-prompt-part">$&nbsp;</span>
+            <span id="term-prompt-interactive" style="display:none;color:#58a6ff;font-family:'JetBrains Mono',monospace;font-size:0.78rem;white-space:nowrap;flex-shrink:0;"></span>
             <input
               id="term-input"
               type="text"
@@ -468,6 +469,8 @@ const filename =
         const output = document.getElementById("term-output")!;
         const input = document.getElementById("term-input") as HTMLInputElement;
         const promptPath = document.getElementById("term-prompt-path")!;
+        const promptParts = document.querySelectorAll<HTMLElement>(".term-prompt-part");
+        const promptInteractive = document.getElementById("term-prompt-interactive") as HTMLElement;
         const vfsRaw = document.getElementById("vfs-data").dataset.posts;
         const posts = JSON.parse(vfsRaw);
 
@@ -506,6 +509,94 @@ const filename =
         let cwd = "~";
         const history: string[] = [];
         let histIdx = -1;
+
+        // コメント対話モードの状態
+        type CommentStep = "name" | "content" | "confirm";
+        interface CommentState { step: CommentStep; postId: string; name?: string; content?: string; contentLines?: string[]; }
+        let commentState: CommentState | null = null;
+
+        const stepLabels: Record<CommentStep, string> = {
+          name:    "名前を入力 › ",
+          content: "コメントを入力 › ",
+          confirm: "送信しますか？ [y/N] › ",
+        };
+
+        function enterCommentStep(step: CommentStep, postId: string, name?: string, content?: string) {
+          commentState = { step, postId, name, content };
+          promptParts.forEach(el => { el.style.display = "none"; });
+          promptInteractive.textContent = stepLabels[step];
+          promptInteractive.style.display = "";
+          input.value = "";
+          input.focus();
+        }
+
+        function exitCommentMode() {
+          commentState = null;
+          promptParts.forEach(el => { el.style.display = ""; });
+          promptInteractive.style.display = "none";
+          input.value = "";
+        }
+
+        async function handleCommentInput(val: string) {
+          const state = commentState!;
+          if (state.step === "name") {
+            const name = val.trim();
+            print(`<span style="color:#58a6ff">名前を入力 › </span><span style="color:#e6edf3">${esc(name)}</span>`);
+            if (!name) {
+              print(`<span style="color:#f85149">名前を入力してください</span>`);
+              input.value = "";
+              return;
+            }
+            enterCommentStep("content", state.postId, name);
+            print(`<span class="t-muted">  (Shift+Enter で改行、Enter で確定)</span>`);
+          } else if (state.step === "content") {
+            const lastLine = val.trim();
+            const allLines = [...(state.contentLines ?? []), lastLine].filter(l => l.length > 0);
+            print(`<span style="color:#58a6ff">コメントを入力 › </span><span style="color:#e6edf3">${esc(val)}</span>`);
+            if (allLines.length === 0) {
+              print(`<span style="color:#f85149">コメントを入力してください</span>`);
+              input.value = "";
+              return;
+            }
+            const content = allLines.join("\n");
+            print(`<span class="t-muted">────────────────────────────</span>`);
+            print(`<span class="t-muted">  名前:  </span><span style="color:#e6edf3">${esc(state.name!)}</span>`);
+            allLines.forEach((line, i) => {
+              print(`<span class="t-muted">${i === 0 ? "  内容:  " : "         "}</span><span style="color:#e6edf3">${esc(line)}</span>`);
+            });
+            print(`<span class="t-muted">────────────────────────────</span>`);
+            enterCommentStep("confirm", state.postId, state.name, content);
+          } else if (state.step === "confirm") {
+            const answer = val.trim().toLowerCase();
+            print(`<span style="color:#58a6ff">送信しますか？ [y/N] › </span><span style="color:#e6edf3">${esc(val || "N")}</span>`);
+            exitCommentMode();
+            if (answer === "y") {
+              print(`<span class="t-muted">送信中...</span>`);
+              try {
+                const res = await fetch(`/api/comments?post=${encodeURIComponent(state.postId)}`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ author: state.name, content: state.content }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                  print(`<span style="color:#f85149">エラー: ${esc(data.error ?? "送信に失敗しました")}</span>`);
+                } else {
+                  const tokenKey = `comment-tokens:${state.postId}`;
+                  const tokens = JSON.parse(localStorage.getItem(tokenKey) ?? "{}");
+                  tokens[data.id] = data.token;
+                  localStorage.setItem(tokenKey, JSON.stringify(tokens));
+                  print(`<span class="t-green">✓ コメントを投稿しました</span>`);
+                  print(`<span class="t-muted">ページをリロードするとコメントが反映されます</span>`);
+                }
+              } catch {
+                print(`<span style="color:#f85149">送信に失敗しました</span>`);
+              }
+            } else {
+              print(`<span class="t-muted">キャンセルしました</span>`);
+            }
+          }
+        }
 
         function print(html: string) {
           const div = document.createElement("div");
@@ -559,6 +650,7 @@ const filename =
             );
             print(`  <span class="t-muted">date</span>            現在日時`);
             print(`  <span class="t-muted">clear</span>           画面クリア`);
+            print(`  <span class="t-muted">comment</span>         コメントを投稿（記事ページのみ）`);
           },
 
           ls: (args) => {
@@ -703,6 +795,16 @@ const filename =
           Airi: () => {
             print(`<span style="color:#f0a8d0;">adorable dog 🐶</span>`);
           },
+
+          comment: () => {
+            const match = window.location.pathname.match(/^\/blog\/(.+)/);
+            if (!match) {
+              print(`<span style="color:#f85149">comment: ブログ記事のページでのみ使用できます</span>`);
+              return;
+            }
+            print(`<span class="t-green">[コメント投稿モード]</span> <span class="t-muted">Ctrl+C でキャンセル</span>`);
+            enterCommentStep("name", match[1]);
+          },
         };
 
         function run(line: string) {
@@ -774,7 +876,23 @@ const filename =
         }
 
         input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && e.shiftKey) {
+            if (commentState?.step === "content") {
+              e.preventDefault();
+              const line = input.value;
+              commentState.contentLines = [...(commentState.contentLines ?? []), line];
+              print(`<span style="color:#58a6ff">${commentState.contentLines.length === 1 ? "コメントを入力 › " : "&gt; "}</span><span style="color:#e6edf3">${esc(line)}</span>`);
+              promptInteractive.textContent = "> ";
+              input.value = "";
+              return;
+            }
+          } else if (e.key === "Enter") {
+            if (commentState) {
+              const val = input.value;
+              input.value = "";
+              handleCommentInput(val);
+              return;
+            }
             const val = input.value.trim();
             if (val) {
               history.unshift(val);
@@ -782,16 +900,27 @@ const filename =
             }
             run(input.value);
             input.value = "";
+          } else if (e.key === "c" && e.ctrlKey) {
+            if (commentState) {
+              e.preventDefault();
+              print(`<span style="color:#58a6ff">${stepLabels[commentState.step]}</span><span class="t-muted">^C</span>`);
+              print(`<span class="t-muted">キャンセルしました</span>`);
+              exitCommentMode();
+              return;
+            }
           } else if (e.key === "Tab") {
+            if (commentState) { e.preventDefault(); return; }
             e.preventDefault();
             tabComplete();
           } else if (e.key === "ArrowUp") {
+            if (commentState) return;
             e.preventDefault();
             if (histIdx < history.length - 1) {
               histIdx++;
               input.value = history[histIdx];
             }
           } else if (e.key === "ArrowDown") {
+            if (commentState) return;
             e.preventDefault();
             if (histIdx > 0) {
               histIdx--;

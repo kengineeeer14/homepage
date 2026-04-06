@@ -103,49 +103,13 @@ const { Content } = await render(post);
         <span id="comment-count" style="font-size: 0.8rem; color: #8b949e; font-weight: 400;"></span>
       </h2>
 
-      <!-- コメントリスト -->
-      <div id="comment-list" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;"></div>
+      <!-- コメント投稿案内 -->
+      <p style="font-size: 0.8rem; color: #8b949e; font-family: 'JetBrains Mono', monospace; margin: -0.75rem 0 1.5rem 0;">
+        ターミナルで <code style="color: #4ade80; background: #161b22; padding: 0.1rem 0.4rem; border-radius: 4px;">comment</code> と入力してコメントを投稿できます。
+      </p>
 
-      <!-- コメントフォーム -->
-      <div style="padding: 1.25rem; border: 1px solid #30363d; border-radius: 8px; background: #161b22;">
-        <p style="font-size: 0.85rem; color: #8b949e; margin: 0 0 1rem 0; font-family: 'JetBrains Mono', monospace;">
-          コメントを書く
-        </p>
-        <form id="comment-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
-          <input
-            id="comment-author"
-            type="text"
-            placeholder="お名前（必須・最大50文字）"
-            maxlength="50"
-            required
-            style="padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 0.2s;"
-            onfocus="this.style.borderColor='#58a6ff'"
-            onblur="this.style.borderColor='#30363d'"
-          />
-          <textarea
-            id="comment-content"
-            placeholder="コメントを入力...（最大1000文字）"
-            maxlength="1000"
-            required
-            rows="4"
-            style="padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 0.875rem; font-family: inherit; outline: none; resize: vertical; transition: border-color 0.2s;"
-            onfocus="this.style.borderColor='#58a6ff'"
-            onblur="this.style.borderColor='#30363d'"
-          ></textarea>
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <button
-              type="submit"
-              id="comment-submit-btn"
-              style="padding: 0.45rem 1rem; background: #238636; border: 1px solid #2ea043; border-radius: 6px; color: #fff; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: background 0.2s;"
-              onmouseenter="this.style.background='#2ea043'"
-              onmouseleave="this.style.background='#238636'"
-            >
-              送信
-            </button>
-            <span id="comment-form-error" style="font-size: 0.8rem; color: #f85149; display: none;"></span>
-          </div>
-        </form>
-      </div>
+      <!-- コメントリスト -->
+      <div id="comment-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
     </div>
 
     <!-- フッターナビ -->
@@ -172,6 +136,12 @@ const { Content } = await render(post);
 
   // バナナボタンをクリックで直接送信
   addBtn.addEventListener("click", () => { sendReaction(BANANA); });
+
+  // 既にバナナをあげていたらボタンを非表示
+  function updateAddBtn() {
+    addBtn.style.display = reacted.has(BANANA) ? "none" : "inline-flex";
+  }
+  updateAddBtn();
 
   // リアクションピルを作成・更新（count=0なら削除）
   function upsertPill(emoji, count) {
@@ -204,6 +174,18 @@ const { Content } = await render(post);
   // リアクション送信（トグル対応）
   async function sendReaction(emoji) {
     const removing = reacted.has(emoji);
+    // 楽観的UI更新：サーバーレスポンスを待たずに即時反映
+    const counts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
+    const prevCount = counts[emoji] ?? 0;
+    const optimisticCount = removing ? prevCount - 1 : prevCount + 1;
+    if (removing) {
+      reacted.delete(emoji);
+    } else {
+      reacted.add(emoji);
+    }
+    localStorage.setItem(storageKey, JSON.stringify([...reacted]));
+    upsertPill(emoji, optimisticCount);
+    updateAddBtn();
     try {
       const res = await fetch(`/api/reactions?post=${encodeURIComponent(postId)}`, {
         method: "POST",
@@ -211,14 +193,7 @@ const { Content } = await render(post);
         body: JSON.stringify({ emoji, remove: removing }),
       });
       const data = await res.json();
-      if (removing) {
-        reacted.delete(emoji);
-      } else {
-        reacted.add(emoji);
-      }
-      localStorage.setItem(storageKey, JSON.stringify([...reacted]));
-      // カウントをキャッシュに保存
-      const counts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
+      // サーバーの実際のカウントで更新
       if (data.count === 0) {
         delete counts[emoji];
       } else {
@@ -226,7 +201,17 @@ const { Content } = await render(post);
       }
       localStorage.setItem(countCacheKey, JSON.stringify(counts));
       upsertPill(emoji, data.count);
-    } catch {}
+    } catch {
+      // エラー時は元の状態に戻す
+      if (removing) {
+        reacted.add(emoji);
+      } else {
+        reacted.delete(emoji);
+      }
+      localStorage.setItem(storageKey, JSON.stringify([...reacted]));
+      upsertPill(emoji, prevCount);
+      updateAddBtn();
+    }
   }
 
   // 初期ロード：まずキャッシュを表示してからサーバーで更新
@@ -257,11 +242,6 @@ const { Content } = await render(post);
 
   const commentList = document.getElementById("comment-list");
   const commentCount = document.getElementById("comment-count");
-  const commentForm = document.getElementById("comment-form");
-  const authorInput = document.getElementById("comment-author");
-  const contentInput = document.getElementById("comment-content");
-  const submitBtn = document.getElementById("comment-submit-btn");
-  const formError = document.getElementById("comment-form-error");
 
   function saveTokens() {
     localStorage.setItem(tokenStoreKey, JSON.stringify(myTokens));
@@ -405,50 +385,6 @@ const { Content } = await render(post);
       }
     } catch {}
   }
-
-  // コメント送信
-  commentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const author = authorInput.value.trim();
-    const content = contentInput.value.trim();
-    if (!author || !content) return;
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = "送信中...";
-    formError.style.display = "none";
-
-    try {
-      const res = await fetch(`/api/comments?post=${encodeURIComponent(postId)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ author, content }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        formError.textContent = data.error ?? "送信に失敗しました。";
-        formError.style.display = "inline";
-        return;
-      }
-
-      // トークンを保存
-      myTokens[data.id] = data.token;
-      saveTokens();
-
-      // 空メッセージを削除
-      document.getElementById("comment-empty")?.remove();
-
-      commentList.appendChild(renderComment(data));
-      updateCount(1);
-      authorInput.value = "";
-      contentInput.value = "";
-    } catch {
-      formError.textContent = "送信に失敗しました。";
-      formError.style.display = "inline";
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "送信";
-    }
-  });
 
   loadComments();
 </script>

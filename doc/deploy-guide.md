@@ -70,6 +70,7 @@ CLOUDFLARE_API_TOKEN='あなたのAPIトークン' npx wrangler pages deploy dis
 本番URL: https://homepage-3pk.pages.dev
 
 > **APIトークンの取得（初回のみ）**
+>
 > 1. https://dash.cloudflare.com にログイン
 > 2. 右上アイコン → **My Profile** → **API Tokens**
 > 3. **Create Token** → **Edit Cloudflare Workers** テンプレートを選択

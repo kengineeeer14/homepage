@@ -234,7 +234,7 @@ const { Content } = await render(post);
     .catch(() => {});
 </script>
 
-<script define:vars={{ postId: post.id }}>
+<script define:vars={{ postId: post.id.replace(/\.[^/.]+$/, "") }}>
   // コメント機能
   const tokenStoreKey = `comment-tokens:${postId}`;
   const myTokens = JSON.parse(localStorage.getItem(tokenStoreKey) ?? "{}");
@@ -386,5 +386,6 @@ const { Content } = await render(post);
   }
 
   loadComments();
+  setInterval(loadComments, 15000);
 </script>
 </BaseLayout>

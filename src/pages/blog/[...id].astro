@@ -106,45 +106,18 @@ const { Content } = await render(post);
       <!-- コメントリスト -->
       <div id="comment-list" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;"></div>
 
-      <!-- コメントフォーム -->
+      <!-- コメント投稿案内 -->
       <div style="padding: 1.25rem; border: 1px solid #30363d; border-radius: 8px; background: #161b22;">
-        <p style="font-size: 0.85rem; color: #8b949e; margin: 0 0 1rem 0; font-family: 'JetBrains Mono', monospace;">
+        <p style="font-size: 0.8rem; color: #8b949e; margin: 0 0 0.75rem 0; font-family: 'JetBrains Mono', monospace;">
           コメントを書く
         </p>
-        <form id="comment-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
-          <input
-            id="comment-author"
-            type="text"
-            placeholder="お名前（必須・最大50文字）"
-            maxlength="50"
-            required
-            style="padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 0.2s;"
-            onfocus="this.style.borderColor='#58a6ff'"
-            onblur="this.style.borderColor='#30363d'"
-          />
-          <textarea
-            id="comment-content"
-            placeholder="コメントを入力...（最大1000文字）"
-            maxlength="1000"
-            required
-            rows="4"
-            style="padding: 0.5rem 0.75rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 0.875rem; font-family: inherit; outline: none; resize: vertical; transition: border-color 0.2s;"
-            onfocus="this.style.borderColor='#58a6ff'"
-            onblur="this.style.borderColor='#30363d'"
-          ></textarea>
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <button
-              type="submit"
-              id="comment-submit-btn"
-              style="padding: 0.45rem 1rem; background: #238636; border: 1px solid #2ea043; border-radius: 6px; color: #fff; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: background 0.2s;"
-              onmouseenter="this.style.background='#2ea043'"
-              onmouseleave="this.style.background='#238636'"
-            >
-              送信
-            </button>
-            <span id="comment-form-error" style="font-size: 0.8rem; color: #f85149; display: none;"></span>
-          </div>
-        </form>
+        <p style="font-size: 0.875rem; color: #c9d1d9; margin: 0 0 0.75rem 0; line-height: 1.6;">
+          画面下部のターミナルから投稿できます。
+        </p>
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">
+          <span style="color: #4ade80;">$</span>
+          <span style="color: #e6edf3;">comment</span>
+        </div>
       </div>
     </div>
 
@@ -278,11 +251,6 @@ const { Content } = await render(post);
 
   const commentList = document.getElementById("comment-list");
   const commentCount = document.getElementById("comment-count");
-  const commentForm = document.getElementById("comment-form");
-  const authorInput = document.getElementById("comment-author");
-  const contentInput = document.getElementById("comment-content");
-  const submitBtn = document.getElementById("comment-submit-btn");
-  const formError = document.getElementById("comment-form-error");
 
   function saveTokens() {
     localStorage.setItem(tokenStoreKey, JSON.stringify(myTokens));
@@ -426,50 +394,6 @@ const { Content } = await render(post);
       }
     } catch {}
   }
-
-  // コメント送信
-  commentForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const author = authorInput.value.trim();
-    const content = contentInput.value.trim();
-    if (!author || !content) return;
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = "送信中...";
-    formError.style.display = "none";
-
-    try {
-      const res = await fetch(`/api/comments?post=${encodeURIComponent(postId)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ author, content }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        formError.textContent = data.error ?? "送信に失敗しました。";
-        formError.style.display = "inline";
-        return;
-      }
-
-      // トークンを保存
-      myTokens[data.id] = data.token;
-      saveTokens();
-
-      // 空メッセージを削除
-      document.getElementById("comment-empty")?.remove();
-
-      commentList.appendChild(renderComment(data));
-      updateCount(1);
-      authorInput.value = "";
-      contentInput.value = "";
-    } catch {
-      formError.textContent = "送信に失敗しました。";
-      formError.style.display = "inline";
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "送信";
-    }
-  });
 
   loadComments();
 </script>

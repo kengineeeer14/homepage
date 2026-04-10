@@ -2,7 +2,11 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="About | ken.log" description="このブログについて" meta={{ type: "about" }}>
+<BaseLayout
+  title="About | ken.log"
+  description="このブログについて"
+  meta={{ type: "about" }}
+>
   <article
     class="prose"
     style="max-width: 72ch; margin: 0 auto; padding: 2rem 0;"
@@ -26,18 +30,27 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <li><strong>趣味記事</strong> — 日常・趣味で心に残ったことを記録</li>
       </ul>
 
-      <h2>技術スタック</h2>
+      <h2>リンク</h2>
       <ul>
         <li>
-          <a href="https://astro.build">Astro</a> — 静的サイトジェネレーター
+          <a href="https://github.com/kengineeeer14">
+            <img
+              src="https://www.google.com/s2/favicons?domain=github.com&sz=32"
+              alt=""
+              style="width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; display: inline;"
+            />GitHub
+          </a>
         </li>
         <li>
-          <a href="https://tailwindcss.com">Tailwind CSS</a> — スタイリング
+          <a href="https://x.com/kengineeeer14">
+            <img
+              src="https://www.google.com/s2/favicons?domain=x.com&sz=32"
+              alt=""
+              style="width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; display: inline;"
+            />X
+          </a>
         </li>
-        <li><a href="https://katex.org">KaTeX</a> — 数式レンダリング</li>
-        <li>Shiki — シンタックスハイライト</li>
       </ul>
-
       <hr />
       <p style="color: #8b949e; font-size: 0.9rem;">
         記事の内容に誤りや改善点があればお知らせください。

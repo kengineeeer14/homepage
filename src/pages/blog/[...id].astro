@@ -382,6 +382,9 @@ const { Content } = await render(post);
     return el;
   }
 
+  const INITIAL_COMMENT_COUNT = 3;
+  let expanded = false;
+
   let currentCount = 0;
   function updateCount(delta) {
     currentCount += delta;
@@ -404,8 +407,19 @@ const { Content } = await render(post);
         empty.textContent = "n = 0";
         commentList.appendChild(empty);
       } else {
-        for (const c of comments) {
+        const visible = expanded ? comments : comments.slice(0, INITIAL_COMMENT_COUNT);
+        for (const c of visible) {
           commentList.appendChild(renderComment(c));
+        }
+        if (!expanded && comments.length > INITIAL_COMMENT_COUNT) {
+          const rest = comments.length - INITIAL_COMMENT_COUNT;
+          const btn = document.createElement("button");
+          btn.style.cssText = "margin-top: 0.5rem; background: none; border: none; color: #484f58; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px;";
+          btn.textContent = `+ ${rest} more`;
+          btn.addEventListener("mouseenter", () => { btn.style.color = "#8b949e"; });
+          btn.addEventListener("mouseleave", () => { btn.style.color = "#484f58"; });
+          btn.addEventListener("click", () => { expanded = true; loadComments(); });
+          commentList.appendChild(btn);
         }
       }
     } catch {}
@@ -453,6 +467,7 @@ const { Content } = await render(post);
         localStorage.setItem(tokenStoreKey, JSON.stringify(tokens));
         myTokens[data.id] = data.token;
         contentInput.value = "";
+        expanded = true;
         await loadComments();
       }
     } catch {

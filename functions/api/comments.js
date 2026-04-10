@@ -28,23 +28,20 @@ export async function onRequestPost(context) {
 
   if (!postId) return jsonResponse({ error: "post parameter required" }, 400);
 
-  let author, content;
+  let content;
   try {
     const body = await context.request.json();
-    author = body.author?.trim();
     content = body.content?.trim();
   } catch {
     return jsonResponse({ error: "invalid JSON body" }, 400);
   }
 
-  if (!author || !content) return jsonResponse({ error: "author and content required" }, 400);
-  if (author.length > 50) return jsonResponse({ error: "author too long (max 50)" }, 400);
+  if (!content) return jsonResponse({ error: "content required" }, 400);
   if (content.length > 1000) return jsonResponse({ error: "content too long (max 1000)" }, 400);
 
   const token = crypto.randomUUID();
   const comment = {
     id: crypto.randomUUID(),
-    author,
     content,
     timestamp: new Date().toISOString(),
     edited: false,

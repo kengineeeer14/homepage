@@ -434,13 +434,6 @@ const { Content } = await render(post);
     contentInput.style.height = "auto";
     contentInput.style.height = contentInput.scrollHeight + "px";
   });
-  // Enterで送信、Shift+Enterで改行
-  contentInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      submitBtn.click();
-    }
-  });
 
   // コメント投稿フォーム
   const submitBtn = document.getElementById("comment-submit-btn");

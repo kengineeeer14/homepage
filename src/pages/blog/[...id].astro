@@ -429,7 +429,7 @@ const { Content } = await render(post);
   setInterval(loadComments, 15000);
 
   // テキストエリア自動リサイズ
-  const contentInput = document.getElementById("comment-content") as HTMLTextAreaElement;
+  const contentInput = document.getElementById("comment-content");
   contentInput.addEventListener("input", () => {
     contentInput.style.height = "auto";
     contentInput.style.height = contentInput.scrollHeight + "px";
@@ -443,8 +443,8 @@ const { Content } = await render(post);
   });
 
   // コメント投稿フォーム
-  const submitBtn = document.getElementById("comment-submit-btn") as HTMLButtonElement;
-  const formError = document.getElementById("comment-form-error") as HTMLSpanElement;
+  const submitBtn = document.getElementById("comment-submit-btn");
+  const formError = document.getElementById("comment-form-error");
 
   submitBtn.addEventListener("click", async () => {
     const content = contentInput.value.trim();

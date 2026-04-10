@@ -152,9 +152,11 @@ const { Content } = await render(post);
   // バナナボタンをクリックで直接送信
   addBtn.addEventListener("click", () => { sendReaction(BANANA); });
 
-  // 既にバナナをあげていたらボタンを非表示
+  // 自分または誰かがバナナをあげていたらボタンを非表示
   function updateAddBtn() {
-    addBtn.style.display = reacted.has(BANANA) ? "none" : "inline-flex";
+    const counts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
+    const bananaCount = counts[BANANA] ?? 0;
+    addBtn.style.display = (reacted.has(BANANA) || bananaCount > 0) ? "none" : "inline-flex";
   }
   updateAddBtn();
 
@@ -234,6 +236,7 @@ const { Content } = await render(post);
   for (const [emoji, count] of Object.entries(cachedCounts)) {
     upsertPill(emoji, count);
   }
+  updateAddBtn();
 
   fetch(`/api/reactions?post=${encodeURIComponent(postId)}`)
     .then(r => r.json())
@@ -246,6 +249,7 @@ const { Content } = await render(post);
       for (const [emoji, count] of Object.entries(data)) {
         upsertPill(emoji, count);
       }
+      updateAddBtn();
     })
     .catch(() => {});
 </script>

@@ -404,12 +404,16 @@ const { Content } = await render(post);
         commentList.appendChild(empty);
       } else {
         const btnStyle = "margin-top: 0.25rem; margin-bottom: 0.5rem; background: none; border: none; color: #484f58; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px;";
+        const reversed = [...comments].reverse();
         if (!expanded) {
-          const startIdx = Math.max(0, comments.length - INITIAL_COMMENT_COUNT);
-          if (startIdx > 0) {
+          const visible = reversed.slice(0, INITIAL_COMMENT_COUNT);
+          for (let i = 0; i < visible.length; i++) {
+            commentList.appendChild(renderComment(visible[i], comments.length - i));
+          }
+          if (comments.length > INITIAL_COMMENT_COUNT) {
             const btn = document.createElement("button");
             btn.style.cssText = btnStyle;
-            btn.textContent = `+ ${startIdx} older`;
+            btn.textContent = `+ ${comments.length - INITIAL_COMMENT_COUNT} older`;
             btn.addEventListener("mouseenter", () => { btn.style.color = "#8b949e"; });
             btn.addEventListener("mouseleave", () => { btn.style.color = "#484f58"; });
             btn.addEventListener("click", () => {
@@ -419,13 +423,9 @@ const { Content } = await render(post);
             });
             commentList.appendChild(btn);
           }
-          const visible = comments.slice(startIdx);
-          for (let i = 0; i < visible.length; i++) {
-            commentList.appendChild(renderComment(visible[i], startIdx + i + 1));
-          }
         } else {
-          for (let i = 0; i < comments.length; i++) {
-            commentList.appendChild(renderComment(comments[i], i + 1));
+          for (let i = 0; i < reversed.length; i++) {
+            commentList.appendChild(renderComment(reversed[i], comments.length - i));
           }
           if (comments.length > INITIAL_COMMENT_COUNT) {
             const btn = document.createElement("button");
@@ -480,7 +480,6 @@ const { Content } = await render(post);
         localStorage.setItem(tokenStoreKey, JSON.stringify(tokens));
         myTokens[data.id] = data.token;
         contentInput.value = "";
-        expanded = true;
         await loadComments();
       }
     } catch {

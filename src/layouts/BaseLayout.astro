@@ -20,7 +20,7 @@ interface Props {
 
 const {
   title,
-  description = "エンジニアの学習・趣味アウトプットブログ",
+  description = "30代のサラリーマンです．好きなことを好きに発信します．",
   meta = {},
 } = Astro.props;
 const canonicalURL = Astro.site
@@ -703,7 +703,6 @@ const filename =
           Airi: () => {
             print(`<span style="color:#f0a8d0;">adorable dog 🐶</span>`);
           },
-
         };
 
         function run(line: string) {
@@ -1088,7 +1087,9 @@ const filename =
 
     <!-- アクセス数トラッキング -->
     <script>
-      const today = new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" });
+      const today = new Date().toLocaleDateString("ja-JP", {
+        timeZone: "Asia/Tokyo",
+      });
       const counted = localStorage.getItem("visited");
       const todayEl = document.getElementById("visits-today");
       const totalEl = document.getElementById("visits-total");
@@ -1100,8 +1101,10 @@ const filename =
           .then((r) => r.json())
           .then((data) => {
             localStorage.setItem("visited", today);
-            if (todayEl && data.today != null) todayEl.textContent = data.today.toLocaleString();
-            if (totalEl && data.total != null) totalEl.textContent = data.total.toLocaleString();
+            if (todayEl && data.today != null)
+              todayEl.textContent = data.today.toLocaleString();
+            if (totalEl && data.total != null)
+              totalEl.textContent = data.total.toLocaleString();
           })
           .catch(() => {});
       } else if (hasDisplay) {
@@ -1109,8 +1112,10 @@ const filename =
         fetch("/api/visits?readonly=1")
           .then((r) => r.json())
           .then((data) => {
-            if (todayEl && data.today != null) todayEl.textContent = data.today.toLocaleString();
-            if (totalEl && data.total != null) totalEl.textContent = data.total.toLocaleString();
+            if (todayEl && data.today != null)
+              todayEl.textContent = data.today.toLocaleString();
+            if (totalEl && data.total != null)
+              totalEl.textContent = data.total.toLocaleString();
           })
           .catch(() => {});
       }

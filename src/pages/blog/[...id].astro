@@ -276,12 +276,9 @@ const { Content } = await render(post);
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  let commentIndex = 0;
-
-  function renderComment(comment) {
+  function renderComment(comment, index) {
     const isMine = !!myTokens[comment.id];
-    commentIndex++;
-    const idx = String(commentIndex).padStart(3, "0");
+    const idx = String(index).padStart(3, "0");
     const el = document.createElement("div");
     el.id = `comment-${comment.id}`;
     el.style.cssText = `padding: 0.85rem 0.9rem; border-left: 2px solid ${isMine ? "#58a6ff" : "#21262d"}; margin-bottom: 0.75rem; background: ${isMine ? "rgba(88,166,255,0.03)" : "transparent"};`;
@@ -383,7 +380,7 @@ const { Content } = await render(post);
   }
 
   const INITIAL_COMMENT_COUNT = 3;
-  let expanded = false;
+  let expanded = localStorage.getItem(`comment-expanded:${postId}`) === "true";
 
   let currentCount = 0;
   function updateCount(delta) {
@@ -397,7 +394,6 @@ const { Content } = await render(post);
       const res = await fetch(`/api/comments?post=${encodeURIComponent(postId)}`);
       const comments = await res.json();
       currentCount = comments.length;
-      commentIndex = 0;
       commentCount.textContent = `n = ${currentCount}`;
       commentList.innerHTML = "";
       if (comments.length === 0) {
@@ -407,19 +403,43 @@ const { Content } = await render(post);
         empty.textContent = "n = 0";
         commentList.appendChild(empty);
       } else {
-        const visible = expanded ? comments : comments.slice(0, INITIAL_COMMENT_COUNT);
-        for (const c of visible) {
-          commentList.appendChild(renderComment(c));
-        }
-        if (!expanded && comments.length > INITIAL_COMMENT_COUNT) {
-          const rest = comments.length - INITIAL_COMMENT_COUNT;
-          const btn = document.createElement("button");
-          btn.style.cssText = "margin-top: 0.5rem; background: none; border: none; color: #484f58; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px;";
-          btn.textContent = `+ ${rest} more`;
-          btn.addEventListener("mouseenter", () => { btn.style.color = "#8b949e"; });
-          btn.addEventListener("mouseleave", () => { btn.style.color = "#484f58"; });
-          btn.addEventListener("click", () => { expanded = true; loadComments(); });
-          commentList.appendChild(btn);
+        const btnStyle = "margin-top: 0.25rem; margin-bottom: 0.5rem; background: none; border: none; color: #484f58; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 2px;";
+        if (!expanded) {
+          const startIdx = Math.max(0, comments.length - INITIAL_COMMENT_COUNT);
+          if (startIdx > 0) {
+            const btn = document.createElement("button");
+            btn.style.cssText = btnStyle;
+            btn.textContent = `+ ${startIdx} older`;
+            btn.addEventListener("mouseenter", () => { btn.style.color = "#8b949e"; });
+            btn.addEventListener("mouseleave", () => { btn.style.color = "#484f58"; });
+            btn.addEventListener("click", () => {
+              expanded = true;
+              localStorage.setItem(`comment-expanded:${postId}`, "true");
+              loadComments();
+            });
+            commentList.appendChild(btn);
+          }
+          const visible = comments.slice(startIdx);
+          for (let i = 0; i < visible.length; i++) {
+            commentList.appendChild(renderComment(visible[i], startIdx + i + 1));
+          }
+        } else {
+          for (let i = 0; i < comments.length; i++) {
+            commentList.appendChild(renderComment(comments[i], i + 1));
+          }
+          if (comments.length > INITIAL_COMMENT_COUNT) {
+            const btn = document.createElement("button");
+            btn.style.cssText = btnStyle;
+            btn.textContent = `- show less`;
+            btn.addEventListener("mouseenter", () => { btn.style.color = "#8b949e"; });
+            btn.addEventListener("mouseleave", () => { btn.style.color = "#484f58"; });
+            btn.addEventListener("click", () => {
+              expanded = false;
+              localStorage.setItem(`comment-expanded:${postId}`, "false");
+              loadComments();
+            });
+            commentList.appendChild(btn);
+          }
         }
       }
     } catch {}

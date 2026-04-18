@@ -266,6 +266,7 @@ const { Content } = await render(post);
         }
         localStorage.setItem(countCacheKey, JSON.stringify(counts));
         upsertPill(emoji, data.count);
+        updateAddBtn();
       } catch {
         // エラー時は元の状態に戻す
         if (removing) {

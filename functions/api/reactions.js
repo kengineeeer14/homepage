@@ -76,7 +76,7 @@ export async function onRequestPost(context) {
   }
   await kv.put(key, JSON.stringify(data));
 
-  return new Response(JSON.stringify({ emoji, count: data[emoji] }), {
+  return new Response(JSON.stringify({ emoji, count: data[emoji] ?? 0 }), {
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 }

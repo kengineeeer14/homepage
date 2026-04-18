@@ -188,8 +188,13 @@ const { Content } = await render(post);
     pill.innerHTML = `<span>${emoji}</span><span style="font-size:0.78rem; color:${active ? "#58a6ff" : "#8b949e"}; font-family:'JetBrains Mono',monospace;">${count}</span>`;
   }
 
+  // リクエスト中の絵文字を管理（多重送信防止）
+  const inFlight = new Set();
+
   // リアクション送信（トグル対応）
   async function sendReaction(emoji) {
+    if (inFlight.has(emoji)) return;
+    inFlight.add(emoji);
     const removing = reacted.has(emoji);
     // 楽観的UI更新：サーバーレスポンスを待たずに即時反映
     const counts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
@@ -203,6 +208,11 @@ const { Content } = await render(post);
     localStorage.setItem(storageKey, JSON.stringify([...reacted]));
     upsertPill(emoji, optimisticCount);
     updateAddBtn();
+    // リクエスト中は視覚的に無効化
+    const targetEl = emoji === BANANA
+      ? addBtn
+      : document.getElementById(`pill-${[...emoji].map(c => c.codePointAt(0).toString(16)).join("-")}`);
+    if (targetEl) targetEl.style.opacity = "0.5";
     try {
       const res = await fetch(`/api/reactions?post=${encodeURIComponent(postId)}`, {
         method: "POST",
@@ -228,6 +238,9 @@ const { Content } = await render(post);
       localStorage.setItem(storageKey, JSON.stringify([...reacted]));
       upsertPill(emoji, prevCount);
       updateAddBtn();
+    } finally {
+      inFlight.delete(emoji);
+      if (targetEl) targetEl.style.opacity = "1";
     }
   }
 

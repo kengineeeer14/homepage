@@ -87,8 +87,6 @@ const { Content } = await render(post);
           id="add-reaction-btn"
           title="バナナを送る"
           style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.65rem; background: #0d1117; border: 1px solid #30363d; border-radius: 20px; color: #8b949e; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: border-color 0.2s, color 0.2s, box-shadow 0.2s; flex-shrink: 0;"
-          onmouseenter="this.style.borderColor='#58a6ff';this.style.color='#58a6ff';this.style.boxShadow='0 0 0 3px rgba(88,166,255,0.15)'"
-          onmouseleave="this.style.borderColor='#30363d';this.style.color='#8b949e';this.style.boxShadow='none'"
         >
           <span>🍌</span>
         </button>
@@ -181,17 +179,33 @@ const { Content } = await render(post);
       sendReaction(BANANA);
     });
 
-    // 自分または誰かがバナナをあげていたらボタンを非表示
-    function updateAddBtn() {
-      const counts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
-      const bananaCount = counts[BANANA] ?? 0;
-      addBtn.style.display =
-        reacted.has(BANANA) || bananaCount > 0 ? "none" : "inline-flex";
+    // バナナボタンを常に表示（カウントとアクティブ状態を更新）
+    function updateBananaPill(count) {
+      const active = reacted.has(BANANA);
+      addBtn.style.borderColor = active ? "#58a6ff" : "#30363d";
+      addBtn.style.background = active ? "rgba(88,166,255,0.15)" : "#0d1117";
+      addBtn.style.boxShadow = active ? "0 0 0 3px rgba(88,166,255,0.1)" : "none";
+      addBtn.style.color = active ? "#58a6ff" : "#8b949e";
+      addBtn.innerHTML = count > 0
+        ? `<span>🍌</span><span style="font-size:0.78rem; font-family:'JetBrains Mono',monospace;">${count}</span>`
+        : `<span>🍌</span>`;
     }
-    updateAddBtn();
+    function refreshBananaPill() {
+      const counts = JSON.parse(localStorage.getItem(countCacheKey) ?? "{}");
+      updateBananaPill(counts[BANANA] ?? 0);
+    }
+    addBtn.addEventListener("mouseenter", () => {
+      if (!reacted.has(BANANA))
+        addBtn.style.boxShadow = "0 0 0 3px rgba(88,166,255,0.15)";
+    });
+    addBtn.addEventListener("mouseleave", () => {
+      if (!reacted.has(BANANA)) addBtn.style.boxShadow = "none";
+    });
+    refreshBananaPill();
 
     // リアクションピルを作成・更新（count=0なら削除）
     function upsertPill(emoji, count) {
+      if (emoji === BANANA) { updateBananaPill(count); return; }
       const id = `pill-${[...emoji].map((c) => c.codePointAt(0).toString(16)).join("-")}`;
       let pill = document.getElementById(id);
       if (count === 0) {
@@ -239,7 +253,6 @@ const { Content } = await render(post);
       }
       localStorage.setItem(storageKey, JSON.stringify([...reacted]));
       upsertPill(emoji, optimisticCount);
-      updateAddBtn();
       // リクエスト中は視覚的に無効化
       const targetEl =
         emoji === BANANA
@@ -266,7 +279,6 @@ const { Content } = await render(post);
         }
         localStorage.setItem(countCacheKey, JSON.stringify(counts));
         upsertPill(emoji, data.count);
-        updateAddBtn();
       } catch {
         // エラー時は元の状態に戻す
         if (removing) {
@@ -276,7 +288,6 @@ const { Content } = await render(post);
         }
         localStorage.setItem(storageKey, JSON.stringify([...reacted]));
         upsertPill(emoji, prevCount);
-        updateAddBtn();
       } finally {
         inFlight.delete(emoji);
         if (targetEl) targetEl.style.opacity = "1";
@@ -290,7 +301,7 @@ const { Content } = await render(post);
     for (const [emoji, count] of Object.entries(cachedCounts)) {
       upsertPill(emoji, count);
     }
-    updateAddBtn();
+    refreshBananaPill();
 
     fetch(`/api/reactions?post=${encodeURIComponent(postId)}`)
       .then((r) => r.json())
@@ -303,7 +314,7 @@ const { Content } = await render(post);
         for (const [emoji, count] of Object.entries(data)) {
           upsertPill(emoji, count);
         }
-        updateAddBtn();
+        refreshBananaPill();
       })
       .catch(() => {});
   </script>
